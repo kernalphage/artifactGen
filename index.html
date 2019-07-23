@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <style>
+        div, pre {
+            padding: 10px;
+            font-family: monospace;
+            margin: 2px;
+        }
+        .logger{
+            background-color: palegoldenrod;
+            border: 3px solid yellow;
+            width: 100%;
+        }
+        .logger .warn {
+            background-color: rosybrown;
+        }
+        .logger .success {
+            background-color: palegreen;
+        }
+        #tokens div{
+            display: inline-block;
+            border: 1px solid black;
+        }
+        </style>
+
+    </head>
+    <body>
+        <div id="tokens">
+            
+        </div>
+        <div class="logger" id="logger">
+                <div class="warn" > lookit </div>
+                <div class="success" > lookit </div>
+        </div>
+    </body>
+    <script id="sample_text" type="raw_file">
+        // ideas for a DSL for proc items
+// assume .desc is default? 
+
+[item]
+@item: #ring | #sword | #shield 
+@desc {item} #factoid
+
+[factoid]
+@desc
+	"it once belonged to my" #relative |
+	found at the bottom of the ocean; $value * 1.1 |
+	can you believe someone threw this away? |
+	"it sticks to the metal table slightly"!if({ferrous})|
+@desc + #factoid | .| 
+
+
+{verb}!ed 
+
+[ring]
+$value 122:200
+@name ring
+@geo ringGeo 
+@metal #metal
+@wear #tarnish
+@decoration	#filligree| #slime
+@desc a {wear} {metal} ring 
+
+
+[wear]
+@desc @val
+	disgusting; 1:5|
+	dirty; 4:10|
+	tarnished; 10:40|
+	clean; 50:100|
+	pristine; 110:400|
+
+[metal]
+@mat shiny
+@desc @color $value
+	golden; !rgb(3,1,5); +110|
+	silver; !rgb(4,6,6); +50|
+	platinum; !rgb(2,4,5); +200|
+    </script>
+    <script type="module" src="index.js" ></script>
+    <script type="module" src="kp.js" ></script>
+    <script type="module" src="Scanner.js" ></script>
+    <script type="module" src="Token.js" ></script> 
+</html>
