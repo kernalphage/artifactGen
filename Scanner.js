@@ -21,11 +21,12 @@ const singleTokens = {
     "$": tk.DOLLAR,
     "#": tk.HASH,
     "?": tk.QUESTION,
+    "=": tk.equals,
 
     "\r": null,
     " ":  null,
     "\t":  null,
-    "\n": tk.NEWLINE,
+    "\n": null,
     "|": tk.BAR
 };
 
@@ -161,7 +162,7 @@ scanTokens(){
             this.advance();
         }
 
-        return this.addToken(tk.COMMENT);
+        //return this.addToken(tk.COMMENT);
     }
 
    // end scanning functions

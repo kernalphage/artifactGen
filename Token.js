@@ -20,7 +20,7 @@ export const tk = makeEnum([
     "DOLLAR",
     "HASH",
     "QUESTION",
-
+    "EQUALS",
 
     "COMMENT",
     "LITERAL",
