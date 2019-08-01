@@ -15,7 +15,12 @@ chaining operators
 ; | , \n :
 */
 
-
+class ParserError {
+    constructor(message, token){
+        this.message = message;
+        this.token = token;
+    }
+}
 
 export class Parser {
  constructor(tokens){
@@ -42,13 +47,12 @@ export class Parser {
     return this.peek().type == tk.EOF;
  }
   match(...tokens) {
-
       matched = _.any(tokens, (t)=>this.check(t) );
       if(matched){
           this.advance();
       }
       return matched;
-} 
+}
 // End parser helper functions 
 
 parse_main(){
@@ -57,7 +61,7 @@ parse_main(){
         statements.push(parse_statement);
     }
 }
-
+/*
 // equality→ comparison(("!=" | "==") comparison) * ;
 parse_equality(){
     let expr = parse_comparison();
@@ -78,14 +82,90 @@ parse_comparison(){
     return expr;
 }
 //primary → NUMBER | STRING | "false" | "true" | "nil"| "(" expression ")";
-
 parse_primary(){
 
 }
-
-parse_ref(){
-    if(this.match(tk.LEFT_BRACKET)){
-        
+*/
+ //  trailing=true todo: allow for trailing break_tokens
+ //  minimum=0 todo: allow for min/max counts parse_fn
+ // TODO: capture break token[s]? 
+find_many(parse_fn, break_token) {
+    if(!parse_fn instanceof 'Function'){
+        let token = parse_fn;
+        parse_fn = ()=>{
+            return this.match(token);
+        }
     }
+
+    let ret = [];
+    do {
+        let parsed = parse_fn();
+        if(parsed instanceof ParseError){ return parsed; } // i'm not a fan of these being everywhere, I might throw 
+        ret.push(parsed);
+    }
+    while(this.match(break_token))
+    return ret;
 }
+parse_assignment(){
+    let target = parse_target();
+    // PARSE ERROR? 
+    if(!this.match(tk.COLON)){
+        return ParseError("Missing ':' in statement definition");
+    }
+    let value = parse_value();
+    // PARSE ERROR? 
+    return AssignmentExpr(target, value);
+}
+
+parse_target(){
+    if(!this.match(tk.AT, tk.DOLLAR)){
+        return Parseerror("target reference should begin with @ or $");
+    }
+    let refType = this.previous();
+    let location = this.parse_locator();
+    return TargetExpr(refType, location);
+}
+parse_value(){
+
+}
+parse_locator(){
+    return this.find_many(tk.LITERAL, tk.PERIOD);
+}
+parse_base_expr(){
+
+}
+parse_number(){
+
+} 
+parse_sideeffect(){
+
+}
+parse_definition_ref(){
+
+}
+parse_tag_ref(){
+
+}
+parse_function(){
+
+}
+
+// definition -> "[" LITERAL "]" assignment*
+    parse_definition(){
+        let defExpr = new DefExpr();
+
+        if(!this.match(tk.LEFT_BRACKET)){
+            return;
+        } 
+        if(!this.match(tk.LITERAL)){
+            return ParserError("Only literals are allowd in the ")
+        }
+        defExpr.name = this.previous();
+
+        if(!this.match(tk.RIGHT_BRACKET)) {
+            return new ParseError("Missing End bracket for object definition");
+        }
+        let assignments = find_many(this.parse_assignment, tk.NEWLINE);
+        return assignments;
+    }
 }

@@ -56,10 +56,11 @@
 $value 122:200
 @name ring
 @geo ringGeo 
-@metal #metal
+@metal #metal_def
 @wear #tarnish
 @decoration	#filligree| #slime
 @desc a {wear} {metal} ring 
+@materials {metal.mat}
 
 
 [wear]
@@ -70,15 +71,17 @@ $value 122:200
 	clean; 50:100|
 	pristine; 110:400|
 
-[metal]
+[metal_def]
 @mat shiny
 @desc @color $value
 	golden; !rgb(3,1,5); +110|
 	silver; !rgb(4,6,6); +50|
-	platinum; !rgb(2,4,5); +200|
+    platinum; !rgb(2,4,5); +200|
+
     </script>
+    <script src="lodash.js"></script>
     <script type="module" src="index.js" ></script>
     <script type="module" src="kp.js" ></script>
     <script type="module" src="Scanner.js" ></script>
-    <script type="module" src="Token.js" ></script> 
+    <script type="module" src="Parser.js"></script>
 </html>
