@@ -1,19 +1,24 @@
 import {makeEnum} from "./kp.js";
 import { tk } from "./Token.js";
+
+let ExpressionTypes = {
+    Definition:['id', 'assignments'],
+    Assignment:['targets', 'values'],
+    Target:['reftype', 'locator'],
+    Locator:['locations'],
+    Statement: ['statements'],
+    Base:['type', 'value'],
+    Number:['values'],
+    SideEffect:['ref', 'op', 'value'],
+    Reference:['type', 'locator'], // might need definition and tag ref??
+    Function:['locator', 'parameters'],
+}
+
 export const Expr = makeEnum([
-    "A"
+    ExpressionTypes.keys
 ]);
 
-/*
-Unitary operators 
 
-
-grouping operators
-[] () {}
-
-chaining operators
-; | , \n :
-*/
 
 class ParserError {
     constructor(message, token){

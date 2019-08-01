@@ -1,19 +1,19 @@
-definition -> "[" LITERAL "]" statement*
-// not sure if i want that ":"
-statement -> target_expr ":" value_expr
-target_expr -> target_id* 
+definition -> "[" LITERAL "]" list(assignment)
+// not sure if i want that as ":", or should it be = ?
+// should target lists have a ";" as well?  
+assignment -> list(target_expr ) ":" list(statement_expr, "|")
 
 // todo: expand with an expression that allows @(#location_to_modify)
 // or "@material.place
-target_id -> ("@","$") locator_expr
+// TODO: list of targets
+target_expr -> ("@" | "$") locator_expr
 
 // person.height.cm for example 
 locator_expr -> list(LITERAL, ".")
 
-value_expr -> list( list(value, ";"), "|") 
-// +100 or 
-value -> base_expr | side_effect 
-base_expr -> LITERAL | STRING | NUMBER | number_expr | definition_ref | tag_ref
+statement_expr -> list( base_expr | side_effect , ";") 
+
+base_expr -> LITERAL | STRING | number_expr | definition_ref | tag_ref
 
 
 number_expr -> NUMBER | list(NUMBER, ":")
@@ -25,3 +25,7 @@ function -> "!" locator_expr "(" list(base_expr, ",") ")"
 
 /// definition: a group of statements will be applied to the  
 // statement: a list of  
+
+// this might simplify things, or complicate them. I'm not sure.
+// it might actually just be locator too. 
+reference -> ("#","@","$") locator_expr | "{" locator_expr "}" 
