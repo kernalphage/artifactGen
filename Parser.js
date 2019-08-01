@@ -57,6 +57,15 @@ export class Parser {
           this.advance();
       }
       return matched;
+} 
+
+// this might be just list without a boundary token
+match_all(...tokens){
+    let ret = [];
+    while(this.match(tokens)){
+        ret.push(this.previous());
+    }
+    return ret;
 }
 // End parser helper functions 
 
@@ -67,6 +76,7 @@ parse_main(){
     }
 }
 /*
+// Parses from the article
 // equality→ comparison(("!=" | "==") comparison) * ;
 parse_equality(){
     let expr = parse_comparison();
@@ -95,11 +105,11 @@ parse_primary(){
  //  minimum=0 todo: allow for min/max counts parse_fn
  // TODO: capture break token[s]? 
 find_many(parse_fn, break_token) {
-    if(!parse_fn instanceof 'Function'){
+    if(!(parse_fn instanceof Function)){
         let token = parse_fn;
         parse_fn = ()=>{
             return this.match(token);
-        }
+        };
     }
 
     let ret = [];
@@ -111,6 +121,51 @@ find_many(parse_fn, break_token) {
     while(this.match(break_token))
     return ret;
 }
+
+parse_base_expr(){
+    let sym = this.peek();
+    let value = null;
+    switch(sym){
+        case tk.LITERAL:
+            value = this.match_all(tk.LITERAL);
+            break;
+        case tk.STRING:
+            value = this.advance();
+            break;
+        case tk.NUMBER:
+            value = this.parse_number();
+            break;
+        case tk.HASH:
+            value = this.parse_definition_ref();
+            break;
+        case tk.LEFT_BRACKET:
+            value = this.parse_tag_ref();
+            break;
+        default:
+            return new ParseError("this is not a base expression");
+    }
+}
+
+// TODO: parse side effect or math
+// value -> base_expr | side_effect
+parse_value(){
+ return this.parse_base_expr(); 
+}
+
+// value_expr -> list( list(value, ";"), "|") 
+parse_value_expr(){
+    let valueList = ()=>{
+        return parse_list(parse_value, ";");
+    };
+    return new ValueExpression(parse_list(valueList, "|"));
+}
+// number_expr -> NUMBER | list(NUMBER, ":")
+parse_number(){
+    let vals = parse_list(tk.NUMBER, ":");
+    return new NumberExpression(vals); 
+}
+
+
 parse_assignment(){
     let target = parse_target();
     // PARSE ERROR? 
@@ -130,31 +185,34 @@ parse_target(){
     let location = this.parse_locator();
     return TargetExpr(refType, location);
 }
-parse_value(){
 
-}
 parse_locator(){
     return this.find_many(tk.LITERAL, tk.PERIOD);
 }
-parse_base_expr(){
-
-}
-parse_number(){
-
-} 
-parse_sideeffect(){
-
-}
+ 
 parse_definition_ref(){
-
+    if(!this.match(tk.HASH)){
+        return ParserError("Definition refs must start with a #");
+    } 
+    return new DefinitionRefExpr(this.parse_locator());
 }
 parse_tag_ref(){
-
+    if(!this.match(tk.LEFT_CURLY)){
+        return ParserError("tag references must start with {");
+    }
+    let loc = this.parse_locator();
+    if(!this.match(tk.RIGHT_CURLY)){
+        return ParserError("tag references must end with {");
+    }
+    return new TagRefExpr(loc);
 }
 parse_function(){
-
+    //ugh
 }
 
+parse_sideeffect(){
+    // ugh
+}
 // definition -> "[" LITERAL "]" assignment*
     parse_definition(){
         let defExpr = new DefExpr();

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify index.js -o dist/bundle.js",
+    "build": "browserify index.js --debug -o dist/bundle.js",
     "watch": "watchify index.js -o dist/bundle.js -v"
   },
   "author": "matt dobler",
@@ -14,20 +14,15 @@
     "transform": [
       [
         "babelify",
-        {
-          "presets": [
-            "es2015"
-          ]
-        }
+        { "presets": ["@babel/preset-env"] }
       ]
     ]
   },
   "dependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
-    "babel": "^6.23.0",
-    "babel-cli": "^6.26.0",
     "babelify": "^10.0.0",
     "browserify": "^16.3.0",
     "watchify": "^3.11.1"
