@@ -4,17 +4,33 @@
   "description": "procedural text and json generator based on twine and dwarf fortress",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
     "build": "browserify index.js --debug -o dist/bundle.js",
     "watch": "watchify index.js -o dist/bundle.js -v"
   },
   "author": "matt dobler",
   "license": "ISC",
+  "jest":{
+    "moduleFileExtensions": ["js", "jsx"],
+    "moduleDirectories": ["node_modules", "bower_components", "shared"],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
+  },
+  "babel":{
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
   "browserify": {
     "transform": [
       [
         "babelify",
-        { "presets": ["@babel/preset-env"] }
+        {
+          "presets": [
+            "@babel/preset-env"
+          ]
+        }
       ]
     ]
   },
@@ -29,7 +45,9 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-jest": "^24.8.0",
     "babel-preset-es2015": "^6.24.1",
-    "babelify": "^10.0.0"
+    "babelify": "^10.0.0",
+    "jest": "^24.8.0"
   }
 }

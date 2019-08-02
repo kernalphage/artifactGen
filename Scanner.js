@@ -42,7 +42,17 @@ export class Scanner{
         this.line = 1;
         this.source = source;
         this.tokens = [];
+        this.scanTokens();
     }
+
+    scanTokens(){
+        while(!this.isAtEnd()){
+            this.start = this.current;
+            this.scanToken();
+        }
+        this.tokens.push(new Token(tk.EOF, "", this.line));
+    }
+
 
     export(){
         var out = "Source file: \n";
@@ -83,13 +93,6 @@ export class Scanner{
         return this.error("unparsed string at " + c );
     }
 
-scanTokens(){
-        while(!this.isAtEnd()){
-            this.start = this.current;
-            this.scanToken();
-        }
-        this.tokens.push(new Token(tk.EOF, "", this.line));
-    }
 
 /// functions for moving along the source 
     error(message){
@@ -104,7 +107,7 @@ scanTokens(){
         return this.source.charAt(this.current-1);
     }
     addToken(type, val = null){
-        if(type == null) { this.error("null type found! "); return  false; };
+        if(type == null) { return  false; };
         let text = this.source.substring(this.start, this.current);
         this.tokens.push(new Token(type, text, this.line, val));
         return true;

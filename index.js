@@ -5,7 +5,6 @@ import {log} from "./logging.js"
 var idea_txt = document.getElementById("sample_text").innerText;
 log(idea_txt);
 var s =new Scanner(idea_txt);
-s.scanTokens();
 //log(s.export());
 
 function addMyTag(text, klass, parent){
