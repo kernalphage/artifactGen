@@ -1,3 +1,5 @@
+world = list(definiton, NEWLINE)
+
 definition -> "[" LITERAL "]" list(assignment)
 // not sure if i want that as ":", or should it be = ?
 // should target lists have a ";" as well?  
@@ -5,7 +7,7 @@ assignment -> list(target_expr ) ":" list(statement_expr, "|")
 
 // todo: expand with an expression that allows @(#location_to_modify)
 // or "@material.place
-target_expr -> ("@" | "$") locator_expr
+target_expr -> ("@" | "$" ) locator_expr
 
 // person.height.cm for example 
 locator_expr -> list(LITERAL, ".")
@@ -27,4 +29,7 @@ function -> "!" locator_expr "(" list(base_expr, ",") ")"
 
 // this might simplify things, or complicate them. I'm not sure.
 // it might actually just be locator too. 
-reference -> ("#","@","$") locator_expr | "{" locator_expr "}" 
+reference -> ("#","@","$") locator_expr 
+
+
+lvalue -> "$"? locator_expr

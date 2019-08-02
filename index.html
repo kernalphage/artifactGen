@@ -38,8 +38,8 @@
 // assume .desc is default? 
 
 [item]
-@item: #ring | #sword | #shield 
-@desc {item} #factoid
+@item = #ring | #sword | #shield 
+@desc = {item} #factoid
 
 [factoid]
 @desc
@@ -47,20 +47,20 @@
 	found at the bottom of the ocean; $value * 1.1 |
 	can you believe someone threw this away? |
 	"it sticks to the metal table slightly"!if({ferrous})|
-@desc + #factoid | .| 
+    @desc + #factoid | .| 
 
 
 {verb}!ed 
 
 [ring]
 $value 122:200
-@name ring
-@geo ringGeo 
-@metal #metal_def
-@wear #tarnish
-@decoration	#filligree| #slime
-@desc a {wear} {metal} ring 
-@materials {metal.mat}
+name ring
+geo ringGeo 
+metal #metal_def
+wear #tarnish
+decoration	#filligree| #slime
+desc a @wear @metal ring 
+materials @metal.mat
 
 
 [wear]
