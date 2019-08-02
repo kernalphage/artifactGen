@@ -12,13 +12,12 @@ let ExpressionTypes = {
     SideEffect:['ref', 'op', 'value'],
     Reference:['type', 'locator'], // might need definition and tag ref??
     Function:['locator', 'parameters'],
+    LValue: ['type', 'locator'],
 }
 
 export const Expr = makeEnum([
     ExpressionTypes.keys
 ]);
-
-
 
 class ParserError {
     constructor(message, token){
@@ -56,6 +55,10 @@ export class Parser {
       if(matched){
           this.advance();
       }
+      return matched;    matched = _.any(tokens, (t)=>this.check(t) );
+      if(matched){
+          this.advance();
+      }
       return matched;
 } 
 
@@ -70,37 +73,13 @@ match_all(...tokens){
 // End parser helper functions 
 
 parse_main(){
-    let statements = [];
+    let definitions = [];
     while(this.isAtEnd()){
-        statements.push(parse_statement);
+        definitions.push(this.parse_definition);
     }
+    return definitions;
 }
-/*
-// Parses from the article
-// equality→ comparison(("!=" | "==") comparison) * ;
-parse_equality(){
-    let expr = parse_comparison();
-    while(this.match(tk.EQUALS)){
-        let op = this.previous();
-        let right = parse_comparison();
-        expr = new Expr.Binary(expr, op, right);
-    }
-} 
-//comparison → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
-parse_comparison(){
-    let expr = parse_addition();
-    while(this.match(tk.GREATER, tk.GREATER_EQUAL, tk.LESS, tk.LESS_EQUAL)){
-        let op = this.previous();
-        let right = parse_addition();
-        expr = new Expr.Binary(expr, op, right);
-    }
-    return expr;
-}
-//primary → NUMBER | STRING | "false" | "true" | "nil"| "(" expression ")";
-parse_primary(){
 
-}
-*/
  //  trailing=true todo: allow for trailing break_tokens
  //  minimum=0 todo: allow for min/max counts parse_fn
  // TODO: capture break token[s]? 
@@ -108,20 +87,23 @@ find_many(parse_fn, break_token) {
     if(!(parse_fn instanceof Function)){
         let token = parse_fn;
         parse_fn = ()=>{
-            return this.match(token);
+            if(this.match(token))
+                return this.previous();
+            throw new ParseError("Could not find token " + token);
         };
     }
 
     let ret = [];
     do {
         let parsed = parse_fn();
-        if(parsed instanceof ParseError){ return parsed; } // i'm not a fan of these being everywhere, I might throw 
         ret.push(parsed);
     }
-    while(this.match(break_token))
+    while(this.match(break_token));
     return ret;
 }
 
+// TODO: parse side effect or math?
+// base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect
 parse_base_expr(){
     let sym = this.peek();
     let value = null;
@@ -135,74 +117,64 @@ parse_base_expr(){
         case tk.NUMBER:
             value = this.parse_number();
             break;
-        case tk.HASH:
-            value = this.parse_definition_ref();
-            break;
-        case tk.LEFT_BRACKET:
-            value = this.parse_tag_ref();
-            break;
         default:
-            return new ParseError("this is not a base expression");
+            throw new ParseError("this is not a base expression");
     }
+    return new BaseExpr(value);
 }
 
-// TODO: parse side effect or math
-// value -> base_expr | side_effect
-parse_value(){
- return this.parse_base_expr(); 
-}
-
-// value_expr -> list( list(value, ";"), "|") 
-parse_value_expr(){
-    let valueList = ()=>{
-        return parse_list(parse_value, ";");
-    };
-    return new ValueExpression(parse_list(valueList, "|"));
+// statement_expr -> list( base_expr, ",") 
+parse_statement(){
+    return new Statement(this.find_many(this.parse_base_expr, ","));
 }
 // number_expr -> NUMBER | list(NUMBER, ":")
 parse_number(){
-    let vals = parse_list(tk.NUMBER, ":");
+    let vals = this.parse_numberfind_many(tk.NUMBER, ":");
     return new NumberExpression(vals); 
 }
-
-
+// not sure if i want that as ":", or should it be = ?
+// should target lists have a ";" as well?  
+// assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
 parse_assignment(){
-    let target = parse_target();
-    // PARSE ERROR? 
+    let targets = this.find_many(parse_lvalue, ",");
     if(!this.match(tk.COLON)){
-        return ParseError("Missing ':' in statement definition");
+        throw new ParseError("Missing ':' in statement definition");
     }
-    let value = parse_value();
-    // PARSE ERROR? 
-    return AssignmentExpr(target, value);
+    let values = this.find_many(parse_value, "|");
+    return new AssignmentExpr(targets, values);
 }
 
 parse_target(){
     if(!this.match(tk.AT, tk.DOLLAR)){
-        return Parseerror("target reference should begin with @ or $");
+        throw new ParseError("target reference should begin with @ or $");
     }
     let refType = this.previous();
     let location = this.parse_locator();
     return TargetExpr(refType, location);
 }
 
+// hmm slashes or dots? slashes let me do .. 
+// person.height.cm for example 
+// TODO: players.0.name, or maybe players.#.name for like... random select?
+
+// locator_expr -> list(LITERAL, ".")
 parse_locator(){
     return this.find_many(tk.LITERAL, tk.PERIOD);
 }
  
 parse_definition_ref(){
     if(!this.match(tk.HASH)){
-        return ParserError("Definition refs must start with a #");
+        throw new ParserError("Definition refs must start with a #");
     } 
     return new DefinitionRefExpr(this.parse_locator());
 }
 parse_tag_ref(){
     if(!this.match(tk.LEFT_CURLY)){
-        return ParserError("tag references must start with {");
+        throw new ParserError("tag references must start with {");
     }
     let loc = this.parse_locator();
     if(!this.match(tk.RIGHT_CURLY)){
-        return ParserError("tag references must end with {");
+        throw new ParserError("tag references must end with {");
     }
     return new TagRefExpr(loc);
 }
@@ -213,22 +185,33 @@ parse_function(){
 parse_sideeffect(){
     // ugh
 }
-// definition -> "[" LITERAL "]" assignment*
+// definition -> "[" LITERAL "]" list(assignment, ;)
     parse_definition(){
         let defExpr = new DefExpr();
-
         if(!this.match(tk.LEFT_BRACKET)){
             return;
         } 
         if(!this.match(tk.LITERAL)){
-            return ParserError("Only literals are allowd in the ")
+            throw new ParserError("Only literals are allowd in the ")
         }
         defExpr.name = this.previous();
 
         if(!this.match(tk.RIGHT_BRACKET)) {
-            return new ParseError("Missing End bracket for object definition");
+            throw new ParseError("Missing End bracket for object definition");
         }
-        let assignments = find_many(this.parse_assignment, tk.NEWLINE);
-        return assignments;
+        defExpr.assignments = find_many(this.parse_assignment, tk.SEMICOLON);
+        return defExpr;
+    }
+    // lvalue -> ("$")? locator_expr
+    parse_lvalue(){
+        let lvalue = new LValueExpr();
+        if(this.check(tk.DOLLAR)){
+            lvalue.type = "ABSOLUTE";
+        } else {
+            lvalue.type = "RELATIVE";
+        } 
+        lvalue.reference = this.find_many(this.parse_locator, tk.DOT);
+        return lvalue;
     }
 }
+
