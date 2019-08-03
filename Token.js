@@ -27,7 +27,6 @@ export const tk = makeEnum([
     "NUMBER",
     "EOF", 
     "ERROR",
-    "NEWLINE",
     "BAR",
     
 ]);
@@ -41,10 +40,8 @@ export class Token{
         this.value = value;
         this.line = line;
     }    
+
     toString(){
-        if(this.symbol == tk.NEWLINE){
-            return "newline";
-        }
         let va = this.value ?  " with value " + this.value : "";
         return this.symbol.toString() + ">" + this.string + "<" + va;
     }

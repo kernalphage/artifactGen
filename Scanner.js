@@ -1,5 +1,6 @@
 import {isAlphaNumeric, isDigit} from "./kp.js";
 import {tk, Token} from "./Token.js"
+import { thisExpression } from "@babel/types";
 
 const singleTokens = {
     "(": tk.LEFT_PAREN,
@@ -46,11 +47,21 @@ export class Scanner{
     }
 
     scanTokens(){
+        let scan_failure = false;
         while(!this.isAtEnd()){
             this.start = this.current;
-            this.scanToken();
+            try{
+                this.scanToken();
+            } catch(e){
+                console.log(e.message);
+                scan_failure = true;
+            }
         }
         this.tokens.push(new Token(tk.EOF, "", this.line));
+        if(scan_failure){
+            console.log("Could not parse source " + this.source);
+            this.tokens = [];
+        }
     }
 
 
@@ -96,8 +107,7 @@ export class Scanner{
 
 /// functions for moving along the source 
     error(message){
-        console.log("Error at " + this.line + ": " + message);
-        return false;
+        throw new Error("Error at " + this.line + ":" + this.current + ": " + message);
     }
     isAtEnd(){
         return this.current >= this.source.length; 
@@ -112,13 +122,14 @@ export class Scanner{
         this.tokens.push(new Token(type, text, this.line, val));
         return true;
     }
-
+/*
     match(expected) {                 
         if (this.isAtEnd()) return false;                         
         if (this.source.charAt(this.current) != expected) return false;
         this.current++;                                           
         return true;
     }
+*/
     peek() {
         if (this.isAtEnd()) return '\0';
         return  this.source.charAt(this.current);
@@ -135,7 +146,7 @@ export class Scanner{
         // TODO: String escape characters goes here. 
         // String expansion? Too much work? 
         while( this.peek() != boundary && !this.isAtEnd()){
-            if(this.peek() == '\n') line++;
+            if(this.peek() == "\n") this.line++;
             this.advance();
         }
         if(this.isAtEnd()){
@@ -143,7 +154,6 @@ export class Scanner{
         }
         this.advance();
         let val = this.source.substring(this.start+1, this.current-1);
-        console.log("Found string " + val);
         return this.addToken(tokenType, val);
     }
     scanNumber(){

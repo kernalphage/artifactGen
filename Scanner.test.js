@@ -10,10 +10,38 @@ test('Scanner can correctly parse comments', () => {
     let source = "WORD // That was a word, couldn't you tell?\n//one more";
     let scan = new Scanner(source);
     console.log(scan.export());
-    expect(scan.tokens.length).toBe(2); // WORD and \n
+    expect(scan.tokens.length).toBe(2); // WORD and EOF
 });
 
-test('Scanner can correctly parse literals', ()=>{
-    let source = 'one_word two-threefour "five literals so yeah"';
+test('printing works correctly', () => {
+    let source = 'one_word \n 2.5 3.';
+    let scan = new Scanner(source);    
+    expect(scan.tokens[0].toString()).toBe("Symbol(LITERAL)>one_word<");
+    expect(scan.tokens[1].toString()).toBe("Symbol(NUMBER)>2.5< with value 2.5");
+});
+
+test('Scanner can correctly parse string literals', ()=>{
+    let source = 'one_word two-threefour \n "five literals\n so yeah"';
     let scan = new Scanner(source);
+    expect(scan.tokens[0].string).toBe("one_word");
+});
+
+test('scanner can accurately parse numbers', () => {
+    let source = "5.1512 230 0";
+    let scan = new Scanner(source);
+    expect(scan.tokens.length).toBe(4);
+    expect(scan.tokens[1].value).toBe(230); 
+    expect(scan.tokens[2].value).toBe(0); 
+}); 
+
+test('Scanner breaks on unterminated strings ', ()=>{
+    let source = '"terminated", "unterminated';
+    let scan = new Scanner(source);
+    expect(scan.tokens.length).toBe(0);
+});
+
+test('Scanner breaks on incorrect characters ', ()=>{
+    let source = '~`^';
+    let scan = new Scanner(source);
+    expect(scan.tokens.length).toBe(0);
 });
