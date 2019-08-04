@@ -14,7 +14,7 @@ const singleTokens = {
     "-": tk.MINUS,
     "+": tk.PLUS,
     ";": tk.SEMICOLON,
-    ":": tk.COlON,
+    ":": tk.COLON,
     "/": tk.SLASH,
     "*": tk.STAR,
     "!": tk.BANG,

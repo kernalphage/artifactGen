@@ -1,5 +1,6 @@
 import {makeEnum} from "./kp.js";
-
+// maybe makeEnum should return a function, making all my calls tk("LEFT PAREN"); 
+// i think the extra quotes are worth some type safety
 export const tk = makeEnum([
     "LEFT_PAREN",
     "RIGHT_PAREN",
@@ -12,7 +13,7 @@ export const tk = makeEnum([
     "MINUS",
     "PLUS",
     "SEMICOLON",
-    "COlON",
+    "COLON",
     "SLASH",
     "STAR",
     "BANG",

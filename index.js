@@ -1,10 +1,18 @@
 import {tk} from "./Token.js"
 import {Scanner} from "./Scanner.js"
 import {log} from "./logging.js"
+import { Parser } from "./Parser.js";
 
 var idea_txt = document.getElementById("sample_text").innerText;
-log(idea_txt);
-var s =new Scanner(idea_txt);
+var simple_text = document.getElementById("simple_example").innerText;
+
+var s =new Scanner(simple_text);
+log(s.export());
+var p = new Parser(s.tokens);
+p.parse_main();
+
+console.log(p.definitions);
+
 //log(s.export());
 
 function addMyTag(text, klass, parent){
