@@ -16,17 +16,13 @@ const ExpressionData = {
     LValue: ['type', 'locator'],
 };
 // I'm so funny 
-const [Ex, pr] = MakeTypeclass(ExpressionData);
+let [_Ex, pr] = MakeTypeclass(ExpressionData);
+let Ex = function(...args){
+    console.log("Creating expression " + JSON.stringify(args));
+    return _Ex(...args);
+} 
 let myNumbers = [2,4,6,8];
 let curNum = Ex(pr.Number,myNumbers); 
-
-
-class ParserError {
-    constructor(message, token){
-        this.message = message;
-        this.token = token;
-    }
-}
 
 export class Parser {
  constructor(tokens){
@@ -56,12 +52,23 @@ export class Parser {
 
  // i think this is the right layer to say... log if tokens is undefined or empty
   match(...tokens) {
+      if(! _.every(tokens)){
+          throw this.ParserError("One or more tokens to match are undefined! " + JSON.stringify(tokens));
+      }
       let matched = tokens.some( (t)=>this.check(t) );
       if(matched){
           this.advance();
       }
       return matched;
 } 
+ParserError(message, token){
+    token = token || this.peek();
+   return {
+       message: message,
+       token: token
+   }
+}
+
 // End parser helper functions 
 
 parse_main(){
@@ -77,7 +84,6 @@ parse_main(){
  //  trailing=true todo: allow for trailing break_tokens
  //  minimum=0 todo: allow for min/max counts parse_fn
  // TODO: capture break token[s]? 
- // TODO: Bindings can suck my dick
  
 find_many(parse_fn, break_token) {
     if(!(parse_fn instanceof Function)){
@@ -85,7 +91,7 @@ find_many(parse_fn, break_token) {
         parse_fn = ()=>{
             if(this.match(token))
                 return this.previous();
-            throw new ParserError("Could not find token " + token);
+            throw this.ParserError("Could not find token " + token.toString());
         };
     }
 
@@ -116,11 +122,11 @@ parse_base_expr(){
             break;
         case tk.NUMBER:
             type="number";
-            value = Ex(pr.Number,this.advance());
-            // value = this.parse_number();
+            //value = Ex(pr.Number,this.advance());
+            value = this.parse_number();
             break;
         default:
-            throw new ParserError("this is not a base expression");
+            throw this.ParserError("this is not a base expression");
     }
     // TODO: Do I need the type if value knows what to do with itself? 
     return Ex(pr.Base, type, value);
@@ -132,16 +138,17 @@ parse_statement(){
 }
 // number_expr -> NUMBER | list(NUMBER, ":")
 parse_number(){
-  //  let vals = this.find_many(tk.NUMBER, tk.COLON);
-  //  return Ex(pr.Number,vals); 
+    let vals = this.find_many(tk.NUMBER, tk.COLON);
+    return Ex(pr.Number,vals); 
 }
+
 // not sure if i want that as ":", or should it be = ?
 // should target lists have a ";" as well?  
 // assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
 parse_assignment(){
     let targets = this.find_many(this.parse_lvalue, tk.COMMA);
     if(!this.match(tk.COLON)){
-        throw new ParserError("Missing ':' in statement definition");
+        throw this.ParserError("Missing ':' in statement definition");
     }
     let values = this.find_many(this.parse_statement, tk.BAR);
     return Ex(pr.Assignment, targets, values);
@@ -149,7 +156,7 @@ parse_assignment(){
 
 parse_target(){
     if(!this.match(tk.AT, tk.DOLLAR)){
-        throw new ParserError("target reference should begin with @ or $");
+        throw this.ParserError("target reference should begin with @ or $");
     }
     let refType = this.previous();
     let location = this.parse_locator();
@@ -167,17 +174,17 @@ parse_locator(){
  
 parse_definition_ref(){
     if(!this.match(tk.HASH)){
-        throw new ParserError("Definition refs must start with a #");
+        throw this.ParserError("Definition refs must start with a #");
     } 
     return Ex(pr.DefinitionRef, this.parse_locator());
 }
 parse_tag_ref(){
     if(!this.match(tk.LEFT_CURLY)){
-        throw new ParserError("tag references must start with {");
+        throw this.ParserError("tag references must start with {");
     }
     let loc = this.parse_locator();
     if(!this.match(tk.RIGHT_CURLY)){
-        throw new ParserError("tag references must end with {");
+        throw this.ParserError("tag references must end with {");
     }
     return Ex(pr.TagRef, loc);
 }
@@ -191,15 +198,15 @@ parse_sideeffect(){
 // definition -> "[" LITERAL "]" list(assignment, ;)
     parse_definition(){
         if(!this.match(tk.LEFT_BRACKET)){
-            throw new ParserError("Definitions must start with a [");
+            throw this.ParserError("Definitions must start with a [");
         } 
         if(!this.match(tk.LITERAL)){
-            throw new ParserError("Only literals are allowd in the ");
+            throw this.ParserError("Only literals are allowd in the ");
         }
         let name = this.previous();
 
         if(!this.match(tk.RIGHT_BRACKET)) {
-            throw new ParserError("Missing End bracket for object definition");
+            throw this.ParserError("Missing End bracket for object definition");
         }
         let assignments = this.find_many(this.parse_assignment, tk.SEMICOLON);
         let defExpr = Ex(pr.Definition, name, assignments);

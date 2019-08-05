@@ -41,8 +41,8 @@ export function MakeTypeclass(TypeData, ClassName){
 }
 
 export function isSameType(a, b){
-    a = (a instanceof Symbol) ? a : a.Type;
-    b = (b instanceof Symbol) ? b : b.Type;
+    a = (a instanceof Object) ?  a.Type : a;
+    b = (b instanceof Object) ?  b.Type : b;
     return a == b; // TODO: Triple equals? 
 }
 
@@ -55,20 +55,4 @@ export function isAlpha(c){
 }
 export function isAlphaNumeric(c) {
     return isAlpha(c) || isDigit(c);
-}
-
-let [MakeAnimal, AnimalTypes] = MakeTypeclass({cat:['tail'], bird:['wing']}, "Animals");
-let tweety = MakeAnimal(AnimalTypes.bird, "yellow");
-let sylvester = MakeAnimal(AnimalTypes.cat, "bushy", "sharp");
-// And then we get pattern matching! (sort of)...
-function describeAnimal(animal) {
-   switch(animal.Type){
-    case AnimalTypes.cat:
-    case AnimalTypes.dog:
-         return "mammalian";
-    case AnimalTypes.bird:
-         return "Avian";
-    default:
-         return "Unknown. Alien?";
-   }
 }

@@ -1,4 +1,5 @@
 import { basename } from "path";
+import {pr} from "./Parser.js";
 import {_} from "lodash";
 
 class Printer {
@@ -11,8 +12,9 @@ class Environment{
         this.parent = parent;
     }
 
-    define(name, value) {
+    applyDefinition(name, value) {
         this.defs[name] = value;
+        return this.defs[name];
     }
     get(name) {
         if (name in defs) {
@@ -28,15 +30,28 @@ class Environment{
 export class Interpreter {
     constructor(){
         this.environment = new Environment();
+        this.visitors = _.fromPairs(
+            [pr.Definition, (expr)=>{
+                let assignments = _.map(expr.assignments, this.visit);
+                return this.applyDefinition(this.visit(expr.id), assignments);
+            }],
+            [pr.Assignment, (expr)=>{
+
+            }]
+        );
     }
 
-    evaluate(){
-        // visitor pattern goes here
+    visit(expr){
+        let fn = this.visitors[expr.Type];
+        if(fn){
+            return this.apply(fn, expr);
+        } else {
+            throw this.RuntimeError("Visitor function for Expresion of type " + expr.Type.toString() + " does not exist");
+        }
     }
 
 visitDefinition(expr){
-    let assignments = _.map(expr.assignments, this.visitAssignment);
-    define(expr['id'], assignments);
+
 }
 
 visitAssignment(expr){

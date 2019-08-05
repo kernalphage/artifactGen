@@ -5,7 +5,8 @@ import {Parser} from './Parser.js';
 test('basic definition', () => {
   let source = `
  [item]
- pi = 3.14
+ pi : 3.14;
+ randomItem : 1:10; 
 `;
   let scan = new Scanner(source);
   let parse = new Parser(scan.tokens);
