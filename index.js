@@ -2,6 +2,8 @@ import {tk} from "./Token.js"
 import {Scanner} from "./Scanner.js"
 import {log} from "./logging.js"
 import { Parser } from "./Parser.js";
+import { Printer } from "./Interpreter.js";
+import{_} from 'lodash';
 
 var idea_txt = document.getElementById("sample_text").innerText;
 var simple_text = document.getElementById("simple_example").innerText;
@@ -10,10 +12,10 @@ var s =new Scanner(simple_text);
 log(s.export());
 var p = new Parser(s.tokens);
 p.parse_main();
+var print = new Printer();
 
-console.log(p.definitions);
-
-//log(s.export());
+var logs = print.execute(p.definitions);
+_.forEach(logs, (d)=>addMyTag(d,'warn', 'logger'));
 
 function addMyTag(text, klass, parent){
    text = text.replace(/\\n/g, "<br\>");

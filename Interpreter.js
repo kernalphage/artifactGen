@@ -1,9 +1,87 @@
 import { basename } from "path";
 import {pr} from "./Parser.js";
+import { FindFromSymbol } from './kp.js';
+import {Token} from './Token.js';
 import {_} from "lodash";
 
-class Printer {
+export class Printer {
+    constructor(){
 
+        this.logState = "";
+        this.tabs = 0;
+
+        this.visitors = {
+            Assignment:  (expr)=>{
+                let targets = this.visitMany(expr.targets);
+                let values = this.visitMany(expr.values);
+                let out = targets.join(" ");
+                out += ":=";
+                out += values.join("[OR]"); 
+                return out;
+            },
+            Definition:  (expr)=>{
+                let name = expr.id.string;
+                let assignments = this.visitMany(expr.assignments);
+                return (name+": <br>"+assignments);
+            },
+            // function
+            Locator:  (expr)=>{
+               return _.map(expr.locations, 'string').join(",");
+            },
+            LValue:  (expr)=>{
+                return this.visit(expr.locator);
+            },
+            Statement: (expr)=>{
+                return this.visitMany(expr.statements);
+            },
+            Base: (expr)=>{
+                return this.visitMany(expr.value);
+            },
+            Number:  (expr)=>{
+                return _.map(expr.values, 'value').join(' to ');
+            },
+            Rvalue:  (expr)=>{
+                
+            }
+        }
+    }
+    execute(definitions){
+        return this.visitMany(definitions);
+    }
+    // TODO: Visit([expr])? => [val]?
+    // TODO: default visit command?
+    visitMany(exprs){
+        var ret = [];
+        if(exprs instanceof Array){
+            for(var i=0; i < exprs.length; i++){
+                ret.push(this.visit(exprs[i]));
+            }
+        
+        return ret;
+        }
+        return [this.visit(exprs)];
+    }
+    visit(expr){
+        this.tabs++;
+        if(expr instanceof Token){
+            return expr.value;
+        }
+        let key = FindFromSymbol(pr, expr.Type);
+        let fn = this.visitors[key];
+        if(fn){
+            return fn.apply(this, [expr]);
+        } else {
+            console.log("Could not find expression " + expr.Type.toString());
+            return JSON.stringify(expr);
+            //throw this.RuntimeError("Visitor function for Expresion of type " + expr.Type.toString() + " does not exist");
+        } 
+        this.tabs--;
+    }
+
+    log(line){
+        let tabs =  _.times(this.tabs, "\t").join("");
+        console.log(tabs+line);
+    }
 };
 
 class Environment{
@@ -30,15 +108,16 @@ class Environment{
 export class Interpreter {
     constructor(){
         this.environment = new Environment();
-        this.visitors = _.fromPairs(
-            [pr.Definition, (expr)=>{
+        this.visitors = {
+            Definition:  (expr)=>{
+                let name = this.visit(expr.id);
                 let assignments = _.map(expr.assignments, this.visit);
-                return this.applyDefinition(this.visit(expr.id), assignments);
-            }],
-            [pr.Assignment, (expr)=>{
-
-            }]
-        );
+                return this.applyDefinition(name, assignments);
+            },
+            Assignment:  (expr)=>{
+                
+            }
+            }
     }
 
     visit(expr){

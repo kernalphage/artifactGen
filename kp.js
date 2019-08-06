@@ -24,6 +24,9 @@ export function makeEnum(arr){
 function TypeFactory(Typeclass, ClassName){
     // Creates an expression of type Symbol, and populates it if possible
     return function (symbol, ...args){
+        if(!symbol){
+            throw new Error("Symbol does not exist!");
+        }
         if(!( _.has(Typeclass, symbol))){
             throw new Error("Symbol " + symbol.toString() + " Not in category " + ClassName);
         }
@@ -32,6 +35,11 @@ function TypeFactory(Typeclass, ClassName){
             obj.Klass = ClassName;  // Not sure if this is needed but hey, why not
         return obj;
     };
+}
+
+export function FindFromSymbol(SymbolAccessor, symbol ){
+    
+    return _.findKey(SymbolAccessor,(sym) =>{return sym == symbol;});
 }
 
 export function MakeTypeclass(TypeData, ClassName){

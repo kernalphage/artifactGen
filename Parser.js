@@ -3,20 +3,20 @@ import { tk } from "./Token.js";
 import {_} from 'lodash';
 
 const ExpressionData = {
-    Definition:['id', 'assignments'],
     Assignment:['targets', 'values'],
-    Target:['reftype', 'locator'],
-    Locator:['locations'],
-    Statement: ['statements'],
     Base:['type', 'value'],
-    Number:['values'],
-    SideEffect:['ref', 'op', 'value'],
-    Reference:['type', 'locator'], // might need definition and tag ref??
+    Definition:['id', 'assignments'],
     Function:['locator', 'parameters'],
+    Locator:['locations'],
     LValue: ['type', 'locator'],
+    Number:['values'],
+    RValue: ['type', 'locator'],
+    SideEffect:['ref', 'op', 'value'],
+    Statement: ['statements'],
 };
 // I'm so funny 
-let [_Ex, pr] = MakeTypeclass(ExpressionData);
+export const [_Ex, pr] = MakeTypeclass(ExpressionData);
+
 let Ex = function(...args){
     console.log("Creating expression " + args[0].toString() + JSON.stringify(args));
     return _Ex(...args);
@@ -142,6 +142,12 @@ parse_base_expr(){  console.log("entering parse_base_expr");
             //value = Ex(pr.Number,this.advance());
             value = this.parse_number();
             break;
+        case tk.HASH:
+        case tk.AT:
+        case tk.DOLLAR:
+            type="rvalue";
+            value=this.parse_rvalue();
+            break;
         default:
             throw this.ParserError("this is not a base expression");
     }
@@ -162,24 +168,15 @@ parse_number(){  console.log("entering parse_number");
 }
 
 // not sure if i want that as ":", or should it be = ?
-// should target lists have a ";" as well?  
+// should lvalue lists use a ";" as well?  
 // assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
 parse_assignment(){  console.log("entering parse_assignment");
     let targets = this.find_many(this.parse_lvalue, tk.COMMA);
     if(!this.match(tk.COLON)){
-        throw this.ParserError("Missing ':' in statement definition");
+        throw this.ParserError("Missing ':' in assignment definition");
     }
     let values = this.find_many(this.parse_statement, tk.BAR);
     return Ex(pr.Assignment, targets, values);
-}
-
-parse_target(){  console.log("entering parse_target");
-    if(!this.match(tk.AT, tk.DOLLAR)){
-        throw this.ParserError("target reference should begin with @ or $");
-    }
-    let refType = this.previous();
-    let location = this.parse_locator();
-    return Ex(pr.Target, refType, location);
 }
 
 // hmm slashes or dots? slashes let me do .. 
@@ -190,7 +187,7 @@ parse_target(){  console.log("entering parse_target");
 parse_locator(){  console.log("entering parse_locator");
     let ret = this.find_many(tk.LITERAL, tk.DOT);
 console.log("exiting parse_locator");
-    return ret;
+    return Ex(pr.Locator, ret);
 }
  
 parse_definition_ref(){  console.log("entering parse_definition_ref");
@@ -199,16 +196,7 @@ parse_definition_ref(){  console.log("entering parse_definition_ref");
     } 
     return Ex(pr.DefinitionRef, this.parse_locator());
 }
-parse_tag_ref(){  console.log("entering parse_tag_ref");
-    if(!this.match(tk.LEFT_CURLY)){
-        throw this.ParserError("tag references must start with {");
-    }
-    let loc = this.parse_locator();
-    if(!this.match(tk.RIGHT_CURLY)){
-        throw this.ParserError("tag references must end with {");
-    }
-    return Ex(pr.TagRef, loc);
-}
+
 parse_function(){  console.log("entering parse_function");
     //ugh
 }
@@ -243,9 +231,18 @@ parse_sideeffect(){  console.log("entering parse_sideeffect");
         } else {
             type = "RELATIVE";
         } 
-        let reference = this.find_many(this.parse_locator, tk.DOT);
+        let reference = this.parse_locator();
         console.log("exiting parse_lvalue");
         return  Ex(pr.LValue, type, reference);
+    }
+    // rvalue -> ("#","@","$") locator_expr 
+    parse_rvalue(){
+        if(!this.match(tk.AT, tk.DOLLAR, tk.HASH)){
+            throw this.ParserError("target reference should begin with @ or $");
+        } 
+        var type = this.previous();
+        var location = this.parse_locator();
+        return new Ex(pr.RValue, type, location);
     }
 }
 

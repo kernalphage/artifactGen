@@ -38,7 +38,7 @@ export class Token{
     constructor(symbol, string, line, value){
         this.symbol = symbol;
         this.string = string;
-        this.value = value;
+        this.value = value || string;
         this.line = line;
     }    
 

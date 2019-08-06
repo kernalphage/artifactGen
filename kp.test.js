@@ -3,7 +3,7 @@ import {makeEnum, MakeTypeclass, isAlpha, isAlphaNumeric, isDigit, isSameType} f
 
 test('basic definition', () => {
 
-    let [MakeAnimal, AnimalTypes] = MakeTypeclass({cat:['tail'], bird:['wing']}, "Animals");
+    let [MakeAnimal, AnimalTypes] = MakeTypeclass({cat:['tail'], bird:['wing'],  dog:['tail'], alien:['homePlanet']}, "Animals");
     let tweety = MakeAnimal(AnimalTypes.bird, "yellow");
     let sylvester = MakeAnimal(AnimalTypes.cat, "bushy", "sharp");
     // And then we get pattern matching! (sort of)...
@@ -19,8 +19,20 @@ test('basic definition', () => {
         }
     }
 
+    function throwNonexistant(){
+        return MakeAnimal(AnimalTypes.grue, "imaginary");
+    }
+
+    let [_,VehicleTypes] = MakeTypeclass({car:['numWheels', 'mpg']});
+    function throwWrongSet(){
+        return MakeAnimal(VehicleTypes.car, "imaginary");
+    }
+
     expect(isSameType(tweety, AnimalTypes.bird)).toBe(true);
     expect(isSameType(sylvester, AnimalTypes.cat)).toBe(true);
+    expect(throwNonexistant).toThrow(/Symbol does not exist!/);
+    expect(throwWrongSet).toThrow(/Not in category/);
+    
 });
 
 test("alphanumeric checks works as expected", ()=>{
