@@ -33,7 +33,8 @@ const singleTokens = {
 
 
 const literals = {
-    '"': ['"', tk.LITERAL],
+        '"': ['"', tk.LITERAL],
+        "'": ["'", tk.LITERAL],
 };
 
 export class Scanner{

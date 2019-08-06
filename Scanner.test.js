@@ -9,7 +9,6 @@ test('Scanner finds all single-character tokens', () => {
 test('Scanner can correctly parse comments', () => {
     let source = "WORD // That was a word, couldn't you tell?\n//one more";
     let scan = new Scanner(source);
-    console.log(scan.export());
     expect(scan.tokens.length).toBe(2); // WORD and EOF
 });
 
@@ -21,9 +20,14 @@ test('printing works correctly', () => {
 });
 
 test('Scanner can correctly parse string literals', ()=>{
-    let source = 'one_word two-threefour \n "five literals\n so yeah"';
+    let source = '"one_word" two_threefour \n "five literals\n so yeah"';
     let scan = new Scanner(source);
-    expect(scan.tokens[0].string).toBe("one_word");
+    expect(scan.tokens[0].value).toBe("one_word");
+    expect(scan.tokens[2].value).toBeTruthy();
+
+    source = "'literally' gone";
+    scan = new Scanner(source);
+    expect(scan.tokens[0].value).toBe("literally");
 });
 
 test('scanner can accurately parse numbers', () => {

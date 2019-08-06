@@ -18,7 +18,7 @@ const ExpressionData = {
 // I'm so funny 
 let [_Ex, pr] = MakeTypeclass(ExpressionData);
 let Ex = function(...args){
-    console.log("Creating expression " + JSON.stringify(args));
+    console.log("Creating expression " + args[0].toString() + JSON.stringify(args));
     return _Ex(...args);
 } 
 let myNumbers = [2,4,6,8];
@@ -71,9 +71,12 @@ ParserError(message, token){
 
 // End parser helper functions 
 
-parse_main(){
+parse_main(){  console.log("entering parse_main");
     this.definitions = [];
     while(!this.isAtEnd()){
+        if(!this.check(tk.LEFT_BRACKET)){
+            break;
+        }
         console.log("starting parse at token " + this.peek().toString());
         let def = this.parse_definition();
         this.definitions.push(def);
@@ -84,8 +87,9 @@ parse_main(){
  //  trailing=true todo: allow for trailing break_tokens
  //  minimum=0 todo: allow for min/max counts parse_fn
  // TODO: capture break token[s]? 
- 
-find_many(parse_fn, break_token) {
+ // TODO: Parse fails on trailing commas (like, this, example,)
+find_many(parse_fn, break_token, must_find_one = true) {
+    console.log("Entering find_many");
     if(!(parse_fn instanceof Function)){
         let token = parse_fn;
         parse_fn = ()=>{
@@ -97,16 +101,29 @@ find_many(parse_fn, break_token) {
 
     let ret = [];
     do {
-        let parsed = parse_fn.apply(this);
-        ret.push(parsed);
+        let curtoken = this.current;
+        try{
+            let parsed = parse_fn.apply(this);
+            ret.push(parsed);
+        } catch(e){
+            // TODO: this might cause more problems than it solves. 
+            // should fix trailing commas
+            this.current = curtoken;
+            console.log("Ignoring message " + e.message + " and popping back to " + this.current);
+            break;
+        }
     }
-    while(this.match(break_token));
+    while (this.match(break_token, tk.EOF));
+    if(must_find_one && ret.length == 0){
+        throw this.ParserError("Could not find a match for find many " + break_token.toString() );
+    }
+    console.log("exiting find_many");
     return ret;
 }
 
 // TODO: parse side effect or math?
 // base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect
-parse_base_expr(){
+parse_base_expr(){  console.log("entering parse_base_expr");
     let sym = this.peek();
     let value = null;
     let type = null;
@@ -115,7 +132,7 @@ parse_base_expr(){
         case tk.STRING:
             type = "literal";
             value = [];
-            while(this.match(tk.STRING, tk.LITERAL)){
+            while (this.match(tk.LITERAL)) {
                 value.push(this.previous());
             }
             // these are quickly becoming the same thing, if I don't create string parsing
@@ -133,11 +150,13 @@ parse_base_expr(){
 }
 
 // statement_expr -> list( base_expr, ",") 
-parse_statement(){
-    return Ex(pr.Statement, this.find_many(this.parse_base_expr, tk.COMMA));
+parse_statement(){  console.log("entering parse_statement");
+    let ret = this.find_many(this.parse_base_expr, tk.COMMA);
+    console.log("exiting parse_statement");
+    return Ex(pr.Statement, ret);
 }
 // number_expr -> NUMBER | list(NUMBER, ":")
-parse_number(){
+parse_number(){  console.log("entering parse_number");
     let vals = this.find_many(tk.NUMBER, tk.COLON);
     return Ex(pr.Number,vals); 
 }
@@ -145,7 +164,7 @@ parse_number(){
 // not sure if i want that as ":", or should it be = ?
 // should target lists have a ";" as well?  
 // assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
-parse_assignment(){
+parse_assignment(){  console.log("entering parse_assignment");
     let targets = this.find_many(this.parse_lvalue, tk.COMMA);
     if(!this.match(tk.COLON)){
         throw this.ParserError("Missing ':' in statement definition");
@@ -154,7 +173,7 @@ parse_assignment(){
     return Ex(pr.Assignment, targets, values);
 }
 
-parse_target(){
+parse_target(){  console.log("entering parse_target");
     if(!this.match(tk.AT, tk.DOLLAR)){
         throw this.ParserError("target reference should begin with @ or $");
     }
@@ -168,17 +187,19 @@ parse_target(){
 // TODO: players.0.name, or maybe players.#.name for like... random select?
 
 // locator_expr -> list(LITERAL, ".")
-parse_locator(){
-    return this.find_many(tk.LITERAL, tk.DOT);
+parse_locator(){  console.log("entering parse_locator");
+    let ret = this.find_many(tk.LITERAL, tk.DOT);
+console.log("exiting parse_locator");
+    return ret;
 }
  
-parse_definition_ref(){
+parse_definition_ref(){  console.log("entering parse_definition_ref");
     if(!this.match(tk.HASH)){
         throw this.ParserError("Definition refs must start with a #");
     } 
     return Ex(pr.DefinitionRef, this.parse_locator());
 }
-parse_tag_ref(){
+parse_tag_ref(){  console.log("entering parse_tag_ref");
     if(!this.match(tk.LEFT_CURLY)){
         throw this.ParserError("tag references must start with {");
     }
@@ -188,15 +209,15 @@ parse_tag_ref(){
     }
     return Ex(pr.TagRef, loc);
 }
-parse_function(){
+parse_function(){  console.log("entering parse_function");
     //ugh
 }
 
-parse_sideeffect(){
+parse_sideeffect(){  console.log("entering parse_sideeffect");
     // ugh
 }
 // definition -> "[" LITERAL "]" list(assignment, ;)
-    parse_definition(){
+    parse_definition(){  console.log("entering parse_definition");
         if(!this.match(tk.LEFT_BRACKET)){
             throw this.ParserError("Definitions must start with a [");
         } 
@@ -210,10 +231,12 @@ parse_sideeffect(){
         }
         let assignments = this.find_many(this.parse_assignment, tk.SEMICOLON);
         let defExpr = Ex(pr.Definition, name, assignments);
+
+        console.log("exiting parse_definition");
         return defExpr;
     }
     // lvalue -> ("$")? locator_expr
-    parse_lvalue(){
+    parse_lvalue(){  console.log("entering parse_lvalue");
         let type = "";
         if(this.check(tk.DOLLAR)){
             type = "ABSOLUTE";
@@ -221,7 +244,8 @@ parse_sideeffect(){
             type = "RELATIVE";
         } 
         let reference = this.find_many(this.parse_locator, tk.DOT);
-        return  Ex(pr.LValue, type, reference);;
+        console.log("exiting parse_lvalue");
+        return  Ex(pr.LValue, type, reference);
     }
 }
 
