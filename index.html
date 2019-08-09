@@ -21,6 +21,12 @@
             display: inline-block;
             border: 1px solid black;
         }
+        .bnf {
+            display: inline-block;
+            border: 1px solid black;
+            margin: 2px;
+            padding: 2px;
+        }
         </style>
 
     </head>
@@ -34,10 +40,13 @@
         </div>
     </body>
     <script id="simple_example" type="raw_file">
-[example]
-pi : 3.141
-[bee]
-cee : eff
+[item]
+pi : 3.14;
+randomItem : 1:10;
+a, b : c, d | 1, 2
+
+[Second]
+value : "special 324"
     </script>
     <script id="sample_text" type="raw_file">
         // ideas for a DSL for proc items

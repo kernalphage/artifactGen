@@ -38,32 +38,12 @@ export class Token{
     constructor(symbol, string, line, value){
         this.symbol = symbol;
         this.string = string;
-        this.value = value || string;
+        this.value = (value == null) ? string : value;
         this.line = line;
     }    
 
     toString(){
-        let va = this.value ?  " with value " + this.value : "";
+        let va = " with value " + this.value;
         return this.symbol.toString() + ">" + this.string + "<" + va;
     }
 };
-
-/* 
-
-{
-	name: ring
-	geo: ringGeo
-	value: 210
-	wear: {
-		val: 3,
-		desc: "disgusting"
-	}
-		metal: {
-			desc: gold,
-			color: "#ff00ff",
-			mat: "shiny"
-		},
-
-	}
-}
-*/

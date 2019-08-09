@@ -15,7 +15,7 @@ test('Scanner can correctly parse comments', () => {
 test('printing works correctly', () => {
     let source = 'one_word \n 2.5 3.';
     let scan = new Scanner(source);    
-    expect(scan.tokens[0].toString()).toBe("Symbol(LITERAL)>one_word<");
+    expect(scan.tokens[0].toString()).toBe("Symbol(LITERAL)>one_word< with value one_word");
     expect(scan.tokens[1].toString()).toBe("Symbol(NUMBER)>2.5< with value 2.5");
 });
 

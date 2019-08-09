@@ -14,7 +14,7 @@ export class Printer {
             Assignment:  (expr)=>{
                 let targets = this.visitMany(expr.targets);
                 let values = this.visitMany(expr.values);
-                let out = targets.join(" ");
+                let     out= targets.join(" ");
                 out += ":=";
                 out += values.join("[OR]"); 
                 return out;
@@ -48,8 +48,6 @@ export class Printer {
     execute(definitions){
         return this.visitMany(definitions);
     }
-    // TODO: Visit([expr])? => [val]?
-    // TODO: default visit command?
     visitMany(exprs){
         var ret = [];
         if(exprs instanceof Array){
@@ -61,6 +59,8 @@ export class Printer {
         }
         return [this.visit(exprs)];
     }
+    // TODO: default visit command?
+    // if i make this a superclass, i can do preVisit() and postVisit() 
     visit(expr){
         this.tabs++;
         if(expr instanceof Token){
@@ -68,8 +68,9 @@ export class Printer {
         }
         let key = FindFromSymbol(pr, expr.Type);
         let fn = this.visitors[key];
+        let ret = "<div class='bnf'>";
         if(fn){
-            return fn.apply(this, [expr]);
+            return ret + fn.apply(this, [expr]) + "</div>";
         } else {
             console.log("Could not find expression " + expr.Type.toString());
             return JSON.stringify(expr);

@@ -7,7 +7,7 @@ test('basic definition', () => {
  [item]
  pi : 3.14;
  randomItem : 1:10;
- a, b : c, d | 1, 2;
+ a, b : c, d | 1, 2
  
  [Second]
  value : "special 324"

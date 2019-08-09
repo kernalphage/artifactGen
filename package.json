@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "browserify index.js --debug -o dist/bundle.js",
-    "watch": "watchify index.js -o dist/bundle.js -v"
+    "watch": "watchify index.js --debug -o dist/bundle.js -v"
   },
   "author": "matt dobler",
   "license": "ISC",
