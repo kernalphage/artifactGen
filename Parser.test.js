@@ -1,7 +1,6 @@
 import {Scanner} from './Scanner.js';
 import {Parser} from './Parser.js';
 
-
 test('basic definition', () => {
   let source = `
  [item]
@@ -21,18 +20,17 @@ test('basic definition', () => {
 
 test('basic reference checking', () => {
   let source = `
-  [constants]
-  math : #maths
+[constants]
+math : #maths
 
-  [maths]
- pi : 3.14;
- alsoPi : @pi;
- e : 3
+[maths]
+pi : 3.14;
+alsoPi : @pi;
+e : 3
 `;
   let scan = new Scanner(source);
   let parse = new Parser(scan.tokens);
   parse.parse_main();
   console.log(JSON.stringify(parse.definitions));
   expect(parse.definitions.length).toBe(2);
-  
 });
