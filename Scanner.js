@@ -113,8 +113,50 @@ export class Scanner {
         // "hero @hero.name was here" => "hero" @hero.name "was here"
         // "too many {@compound}{@word}isms" => "too many" @compound @word "isms"
         // String expansion? Too much work?
+
+
         while (this.peek() != boundary && !this.isAtEnd()) {
-            if (this.peek() == "\n") this.line++;
+            let c = this.peek();
+            switch(c){
+                case "\n":
+                    this.line++;
+                    break;
+                // Parse {interpolation}
+                case "{": {
+                    this.advance();
+                let val = this.source.substring(this.start + 1, this.current - 1);
+                if(val.length > 0){
+                    this.addToken(tokenType, val);
+                }
+                while(this.peek() != "}" && !this.isAtEnd()){
+                    this.start = this.current;
+                    this.scanToken();
+                }
+                this.start = this.current;
+                    break;
+                }
+                // parse "#interpolation"
+                case "@":
+                case "#":
+                case "$":{
+                    this.advance();
+                    let val = this.source.substring(this.start + 1, this.current - 1);
+                    if(val.length > 0){
+                        this.addToken(tokenType, val);
+                    }
+
+                    this.addToken(singleTokens[c], c);
+                    while(!([" ", "\n", "\t", boundary].includes(this.peek())) && !this.isAtEnd()){
+                        this.start = this.current;
+                        this.scanToken();
+                    }
+                    this.current --;
+                    this.start = this.current;
+                   break;
+                }
+                default:
+                    break;
+            }
             this.advance();
         }
         if (this.isAtEnd()) {
@@ -122,7 +164,9 @@ export class Scanner {
         }
         this.advance();
         let val = this.source.substring(this.start + 1, this.current - 1);
-        return this.addToken(tokenType, val);
+        if(val.length > 0){
+            this.addToken(tokenType, val);
+        }
     }
     scanNumber() {
         while (isDigit(this.peek())) this.advance();
@@ -167,17 +211,18 @@ export class Scanner {
             return false;
         };
         let text = this.source.substring(this.start, this.current);
+        console.log("adding token from >" + text +"<");
         this.tokens.push(new Token(type, text, this.line, val));
         return true;
     }
-    /*
-        match(expected) {                 
-            if (this.isAtEnd()) return false;                         
-            if (this.source.charAt(this.current) != expected) return false;
-            this.current++;                                           
-            return true;
-        }
-    */
+    
+    match(expected) {                 
+        if (this.isAtEnd()) return false;                         
+        if (this.source.charAt(this.current) != expected) return false;
+        this.current++;                                           
+        return true;
+    }
+
     peek() {
         if (this.isAtEnd()) return '\0';
         return this.source.charAt(this.current);

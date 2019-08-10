@@ -50,6 +50,12 @@ test('Scanner breaks on incorrect characters ', () => {
     expect(scan.tokens.length).toBe(0);
 });
 
+test("string interpolation", ()=>{
+    let source = '1 "oh {@god} what" "how @dare.you thing" "@or" you "b{close.line}" " {} "  "{}" ';
+    let scan = new Scanner(source);
+    console.log(scan.export());
+});
+
 test('Scanner export', ()=>{
     let source = `
     [item]
