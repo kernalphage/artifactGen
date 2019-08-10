@@ -4,7 +4,7 @@ import {_} from 'lodash';
 
 const ExpressionData = {
     Assignment: ['targets', 'values'],
-    Base: ['type', 'value'],
+    Base: ['value'],
     Definition: ['id', 'assignments'],
     Function: ['locator', 'parameters'],
     Locator: ['locations'],
@@ -78,10 +78,8 @@ export class Parser {
         return this.definitions;
     }
 
-    //  trailing=true todo: allow for trailing break_tokens
-    //  minimum=0 todo: allow for min/max counts parse_fn
-    // TODO: capture break token[s]? 
-    find_many(parse_fn, break_token, must_find_one = true) {
+    find_many(parse_fn, break_token, must_find_one = true, allow_trailing = true) {
+        // map tk.SYMBOL => function to find the symbol
         if (!(parse_fn instanceof Function)) {
             let token = parse_fn;
             parse_fn = () => {
@@ -98,11 +96,15 @@ export class Parser {
                 let parsed = parse_fn.apply(this);
                 ret.push(parsed);
             } catch (e) {
-                // TODO: this might cause more problems than it solves. 
-                // should fix trailing commas
-                this.current = curtoken;
-                console.log("Ignoring message " + e.message + " and popping back to " + this.current);
-                break;
+                if(allow_trailing){
+                    // TODO: this might cause more problems than it solves. 
+                    this.current = curtoken;
+                    console.log("Ignoring message " + e.message + " and popping back to " + this.current);
+                    break;
+                }
+                else {
+                    throw e;
+                }
             }
         }
         while (this.match(break_token, tk.EOF));
@@ -113,38 +115,35 @@ export class Parser {
     }
 
     // TODO: parse side effect and/or math?
-    // base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect
+    // base_expr -> many(LITERAL | STRING | number_expr | rvalue | side_effect)
     parse_base_expr() {
-        let sym = this.peek();
-        let value = null;
-        let type = null;
-        switch (sym.symbol) {
-            case tk.LITERAL:
-                type = "literal";
-                value = [];
-                while (this.match(tk.LITERAL)) {
-                    value.push(this.previous());
-                }
-                break;
-            case tk.NUMBER:
-                type = "number";
-                //value = Ex(pr.Number,this.advance());
-                value = this.parse_number();
-                break;
-            case tk.HASH:
-            case tk.AT:
-            case tk.DOLLAR:
-                type = "rvalue";
-                value = this.parse_rvalue();
-                break;
-            default:
-                throw this.ParserError("this is not a base expression");
+        let values = [];
+        let done = false;
+        while(this.peek() != tk.EOF && !done){
+            let sym = this.peek();
+            switch (sym.symbol) {
+                case tk.LITERAL:
+                    values.push(this.advance());
+                    break;
+                case tk.NUMBER:
+                    values.push(this.parse_number());
+                    break;
+                case tk.HASH:
+                case tk.AT:
+                case tk.DOLLAR:
+                    values.push(this.parse_rvalue());
+                    break;
+                default:
+                    done = true;
+                    break;
+            }
         }
-        // TODO: Do I need the type if value knows what to do with itself? 
-        return Ex(pr.Base, type, value);
+        if(values.length == 0){
+            throw this.ParserError("this is not a base expression");
+        }
+        return Ex(pr.Base, values);
     }
 
-    // TODO: should this be statement_expr -> list(base_expr*, ",")
     // statement_expr -> list( base_expr, ",") 
     parse_statement() {
         let ret = this.find_many(this.parse_base_expr, tk.COMMA);
@@ -156,8 +155,6 @@ export class Parser {
         return Ex(pr.Number, vals);
     }
 
-    // not sure if i want that as ":", or should it be = ?
-    // should lvalue lists use a ";" as well?  
     // assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
     parse_assignment() {
         let targets = this.find_many(this.parse_lvalue, tk.COMMA);

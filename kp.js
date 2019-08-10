@@ -50,7 +50,7 @@ export function MakeTypeclass(TypeData, ClassName) {
 export function isSameType(a, b) {
     a = (a instanceof Object) ? a.Type : a;
     b = (b instanceof Object) ? b.Type : b;
-    return a == b; // TODO: Triple equals? 
+    return a === b; 
 }
 
 // Different useful functions

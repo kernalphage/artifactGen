@@ -48,14 +48,15 @@ export class Printer {
     execute(definitions){
         return this.visitMany(definitions);
     }
+
+    // TODO: i don't like this visit vs visit_many, this is just for Base that may have value or [values]
     visitMany(exprs){
         var ret = [];
         if(exprs instanceof Array){
             for(var i=0; i < exprs.length; i++){
                 ret.push(this.visit(exprs[i]));
             }
-        
-        return ret;
+            return ret;
         }
         return [this.visit(exprs)];
     }
