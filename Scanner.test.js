@@ -49,3 +49,17 @@ test('Scanner breaks on incorrect characters ', () => {
     let scan = new Scanner(source);
     expect(scan.tokens.length).toBe(0);
 });
+
+test('Scanner export', ()=>{
+    let source = `
+    [item]
+    pi : 3.14;
+    randomItem : 1:10;
+    a, b : c, d | 1, 2;
+    
+    [Second]
+    value : "special 324"
+   `;
+   let scan = new Scanner(source);
+   expect(scan.export()).toMatchSnapshot();
+});

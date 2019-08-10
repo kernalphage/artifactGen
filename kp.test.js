@@ -7,7 +7,8 @@ import {
     isAlpha,
     isAlphaNumeric,
     isDigit,
-    isSameType
+    isSameType,
+    FindFromSymbol
 } from "./kp.js";
 
 test('basic definition', () => {
@@ -42,11 +43,14 @@ test('basic definition', () => {
     });
 
     function throwWrongSet() {
-        return MakeAnimal(VehicleTypes.car, "imaginary");
+        return MakeAnimal(VehicleTypes.car, "30");
     }
 
+    expect(FindFromSymbol(AnimalTypes, AnimalTypes.cat)).toBe("cat");
+
+    expect(describeAnimal(sylvester)).toBe("mammalian");
     expect(isSameType(tweety, AnimalTypes.bird)).toBe(true);
-    expect(isSameType(sylvester, AnimalTypes.cat)).toBe(true);
+    expect(isSameType(AnimalTypes.cat, sylvester)).toBe(true);
     expect(throwNonexistant).toThrow(/Symbol does not exist!/);
     expect(throwWrongSet).toThrow(/Not in category/);
 
