@@ -34,32 +34,40 @@ const literals = {
     "'": ["'", tk.LITERAL],
 };
 
+// TODO: use ScannerError instead of this.error for consistency with ParserErrror
+class ScannerError extends Error{
+    constructor(message, token){
+
+    }
+}
+
 export class Scanner {
     constructor(source) {
+        this.source = source;
         this.start = 0;
         this.current = 0;
         this.line = 1;
-        this.source = source;
         this.tokens = [];
         this.scanTokens();
     }
 
     scanTokens() {
-        let scan_failure = false;
+        this.errors = [];
+        this.tokens = [];
         while (!this.isAtEnd()) {
             this.start = this.current;
             try {
                 this.scanToken();
             } catch (e) {
-                console.log(e.message);
-                scan_failure = true;
+                this.errors.push(e);
             }
         }
         this.tokens.push(new Token(tk.EOF, "", this.line));
-        if (scan_failure) {
+        if (this.errors.length > 0) {
             console.log("Could not parse source " + this.source);
             this.tokens = [];
         }
+        return this.errors;
     }
 
     export () {

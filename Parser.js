@@ -24,6 +24,7 @@ export class Parser {
         this.current = 0;
     }
 
+    // TODO: make this a class instead
     ParserError(message, token) {
         token = token || this.peek();
         return {
@@ -68,14 +69,28 @@ export class Parser {
 
     parse_main() {
         this.definitions = [];
+        this.errors = [];
         while (!this.isAtEnd()) {
             if (!this.check(tk.LEFT_BRACKET)) {
                 break;
             }
-            let def = this.parse_definition();
-            this.definitions.push(def);
+            try{
+                let def = this.parse_definition();
+                this.definitions.push(def);
+            } catch(e){
+                this.errors.push(e);
+                this.synchronize();
+            }
         }
         return this.definitions;
+    }
+
+    // TODO: push this back so it can recover at tk.
+    synchronize(){
+        console.log("Recovering from error in " + this.curDefinition.value);
+        while(this.peek() != tk.EOF && this.peek() != tk.LEFT_BRACKET){
+            this.advance();
+        }
     }
 
     find_many(parse_fn, break_token, must_find_one = true, allow_trailing = true) {
@@ -99,7 +114,7 @@ export class Parser {
                 if(allow_trailing){
                     // TODO: this might cause more problems than it solves. 
                     this.current = curtoken;
-                    console.log("Ignoring message " + e.message + " and popping back to " + this.current);
+                    console.log("Ignoring message " + e.message + " and popping back to " + this.tokens[this.current].toString());
                     break;
                 }
                 else {
@@ -184,6 +199,7 @@ export class Parser {
             throw this.ParserError("Only literals are allowd in the ");
         }
         let name = this.previous();
+        this.curDefinition = name;
 
         if (!this.match(tk.RIGHT_BRACKET)) {
             throw this.ParserError("Missing End bracket for object definition");
