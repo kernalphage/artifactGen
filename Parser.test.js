@@ -10,8 +10,9 @@ test('basic definition', () => {
  [item]
  pi : 3.14;
  randomItem : 1:10;
- a, b : c, d | 1, 2;
- 
+ metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10; 
+ description: this is a @metalColor ring, that is worth @metalValue 
+
  [Second]
  value : "special 324"
 `;
@@ -22,6 +23,7 @@ test('basic definition', () => {
 });
 
 
+// TODO: This is a broken test
 test('basic reference checking', () => {
   let source = `
 [constants]

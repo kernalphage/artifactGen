@@ -109,17 +109,17 @@ export class Scanner {
     }
 
     scanString(boundary, tokenType) {
-        // TODO: string expansion goes here.
         // "hero @hero.name was here" => "hero" @hero.name "was here"
         // "too many {@compound}{@word}isms" => "too many" @compound @word "isms"
-        // String expansion? Too much work?
-
 
         while (this.peek() != boundary && !this.isAtEnd()) {
             let c = this.peek();
             switch(c){
                 case "\n":
                     this.line++;
+                    break;
+                case "\\":
+                    // TODO: Put string escapes here
                     break;
                 // Parse {interpolation}
                 case "{": {
@@ -179,9 +179,6 @@ export class Scanner {
         return this.addToken(tk.NUMBER, parseFloat(this.source.substring(this.start, this.current)));
     }
 
-    // TODO: allow for \, \; \\, etc
-    // maybe allow this to be a little more permissive
-    // and have spaces join and be one literal
     scanLiteral() {
         while (isAlphaNumeric(this.peek())) this.advance();
         return this.addToken(tk.LITERAL);
@@ -211,7 +208,6 @@ export class Scanner {
             return false;
         };
         let text = this.source.substring(this.start, this.current);
-        console.log("adding token from >" + text +"<");
         this.tokens.push(new Token(type, text, this.line, val));
         return true;
     }

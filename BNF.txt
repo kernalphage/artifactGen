@@ -13,6 +13,7 @@ lvalue -> ("$")? locator_expr
 // todo: expand with an expression that allows @(#location_to_modify)
 target_expr -> ("@" | "$" ) locator_expr
 // TODO: Many tokens, as long as it doesn't include a ,?
+// TODO: Do i want to split out side_effect and function_expr? so choice_expr can use base_expr directly
 base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | function_expr
 number_expr -> NUMBER | list(NUMBER, ":")
 // TODO: shorthand for "what's on the left side" eg: 
@@ -25,5 +26,10 @@ rvalue -> ("#","@","$") locator_expr
 [NOT IMPLEMENTED]
 side_effect -> lvalue equaity statement_expr
 equality -> (= | += | *= | /= | -=)
-function_expr -> "!" locator_expr "(" list(base_expr, ",") ")"
- 
+function_expr -> "!" LITERAL group_expr?
+
+group_expr -> "(" list(base_expr, ",") ")"
+
+//reward, nextGoal  :  {agree: gold, fetch_quest | silver, fetch_quest; disagree: tomato, shower}
+decision_expr -> "{"  list(choice_expr, ';') "}"
+choice_expr -> base_expr ":" list(statement_expr, "|")

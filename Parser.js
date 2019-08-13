@@ -7,10 +7,10 @@ const ExpressionData = {
     Base: ['value'],
     Definition: ['id', 'assignments'],
     Function: ['locator', 'parameters'],
-    Locator: ['locations'],
-    LValue: ['type', 'locator'],
+    Locator: ['location'],
+    LValue: ['reftype', 'locator'],
     Number: ['values'],
-    RValue: ['type', 'locator'],
+    RValue: ['reftype', 'locator'],
     SideEffect: ['ref', 'op', 'value'],
     Statement: ['statements'],
 };
@@ -210,22 +210,22 @@ export class Parser {
     }
     // lvalue -> ("$")? locator_expr
     parse_lvalue() {
-        let type = "";
+        let reftype = "";
         if (this.check(tk.DOLLAR)) {
-            type = "ABSOLUTE";
+            reftype = "ABSOLUTE";
         } else {
-            type = "RELATIVE";
+            reftype = "RELATIVE";
         }
         let reference = this.parse_locator();
-        return Ex(pr.LValue, type, reference);
+        return Ex(pr.LValue, reftype, reference);
     }
     // rvalue -> ("#","@","$") locator_expr 
     parse_rvalue() {
         if (!this.match(tk.AT, tk.DOLLAR, tk.HASH)) {
             throw this.ParserError("target reference should begin with @ or $");
         }
-        var type = this.previous();
+        var reftype = this.previous();
         var location = this.parse_locator();
-        return new Ex(pr.RValue, type, location);
+        return new Ex(pr.RValue, reftype, location);
     }
 }
