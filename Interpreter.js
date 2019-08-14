@@ -5,13 +5,26 @@ import {Token} from './Token.js';
 import {_} from "lodash";
 
 export class I_Interpreter {
+    constructor(){
+        this.contexts = [];
+    }
+    push_context(env) {
+        this.contexts.push(env);
+    }
+    peek_context() {
+        return _.last(this.contexts);
+    }
+    pop_context() {
+        return this.contexts.pop();
+    }
     execute(definitions){
         return this.visitMany(definitions);
     }
 
     // TODO: i don't like this visit vs visit_many
     // i think I had a binding issue 
-    visitMany(exprs, ctx){
+    visitMany(exprs){
+        let ctx = this.peek_context();
         var ret = [];
         if(exprs instanceof Array){
             for(var i=0; i < exprs.length; i++){
@@ -22,22 +35,21 @@ export class I_Interpreter {
         return [this.visit(exprs, ctx)];
     }
     // TODO: preVisit() and postVisit() to push/pop state?
-    // tODO: I could pass in recursion depth, current root node, lots of fun stuff
-    visit(expr, ctx){
+    visit(expr){
         if(expr instanceof Token){
             return expr.value;
         }
         let key = FindFromSymbol(pr, expr.Type);
         let fn = this.visitors[key];
         if(fn){
-            return fn.apply(this, [expr, ctx]);
+            // TODO: I could pass in recursion depth, entire tree state, lots of fun stuff
+            return fn.apply(this, [expr, this.peek_context()]);
         } else {
             console.log("Could not find expression " + expr.Type.toString());
             return JSON.stringify(expr);
             //throw this.RuntimeError("Visitor function for Expresion of type " + expr.Type.toString() + " does not exist");
         } 
     }
-
 }
 
 export class Printer extends I_Interpreter{
@@ -71,7 +83,7 @@ export class Printer extends I_Interpreter{
                 return _.map(expr.values, 'value').join(' to ');
             },
             RValue:  (expr)=>{
-                return this.visit(expr.type) + this.visit(expr.location);
+                return this.visit(expr.type) + this.visit(expr.locator);
             },
             // sideEffect
             Statement: (expr)=>{
@@ -100,10 +112,10 @@ class Environment{
             }
             cur = cur.defs[loc];
         });
-        let ass = target.pop();
+        let ass = _.last(target);
         cur.defs[ass] = value;
     }
-    get(name) {
+    get(target) {
         if(!(target instanceof Array)){
             target = [target];
         }
@@ -126,7 +138,7 @@ class Environment{
                 out += JSON.stringify(value);
             }
             return out;
-        }).join("\n");
+        }).join("<br/>");
         console.log(output);
         return output;
     }
@@ -157,18 +169,20 @@ export class BasicInterpreter extends I_Interpreter {
     }
 
     export(){
-        return _.map(this.definitions, (d)=> {
-            return d.export();
-        }).join("\n");
+        let output = ""; 
+        _.forIn(this.definitions, (v,k)=> {
+            output += k+": <br/>" + v.export();
+        }).join("<br/>");
+        return output;
     }
-
     constructor(){
         super();
         this.definitions = [];
 
         this.visitors = {
             Assignment:  (expr, ctx)=>{
-                let out = _.zip(expr.targets, expr.values).map( (assignment) =>{
+                let chosenAssignment = _.sample(expr.values);
+                let out = _.zip(expr.targets, chosenAssignment.statements).map((assignment) => {
                     let [target, statements] = assignment;
                     target = target && this.visit(target);
                     console.log("target is " + JSON.stringify(target));
@@ -188,9 +202,10 @@ export class BasicInterpreter extends I_Interpreter {
             Definition:  (expr)=>{
                 let name = expr.id.string;
                 let def = new Environment(name);
-                this.visitMany(expr.assignments, def);
+                this.push_context(def);
+                this.visitMany(expr.assignments);
+                this.pop_context();
                 this.definitions[name] = def;
-                console.log(def.export());
                 return def;
             },
             // function
@@ -204,12 +219,18 @@ export class BasicInterpreter extends I_Interpreter {
                 if(expr.values.length == 1){
                     return expr.values[0].value;
                 } else {
-                    return randomRangeInt(_.map(expr.values, 'value'));
+                    return randomRangeInt(... _.map(expr.values, 'value'));
                 }
             },
-            RValue:  (expr)=>{
+            RValue:  (expr, ctx)=>{
                 // todo: tree shaking?
-                return this.visit(expr.location);
+                let loc = this.visit(expr.locator);
+                let rval = ctx.get(loc);
+                if(rval){
+                    return rval;
+                } else {
+                    return "NOT_FOUND";
+                }
             },
             // sideEffect
             Statement: (expr)=>{

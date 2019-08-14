@@ -7,6 +7,7 @@ assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
 locator_expr -> list(LITERAL, ".")
 statement_expr -> list( base_expr , ",")
 lvalue -> ("$")? locator_expr
+number_expr -> NUMBER | list(NUMBER, ":")
 
 
 [PLANNED CHANGES]
@@ -15,11 +16,10 @@ target_expr -> ("@" | "$" ) locator_expr
 // TODO: Many tokens, as long as it doesn't include a ,?
 // TODO: Do i want to split out side_effect and function_expr? so choice_expr can use base_expr directly
 base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | function_expr
-number_expr -> NUMBER | list(NUMBER, ":")
 // TODO: shorthand for "what's on the left side" eg: 
 // @height : #previous.@  
-// TODO: variable expansion:
-// width, height : #rect.width, #rect.height => width, height : ...#rect 
+// TODO: variable expansion: width, height : #rect.width, #rect.height => width, height : ...#rect 
+// @ is implemented, $ and # are not
 rvalue -> ("#","@","$") locator_expr
 
 // TODO:

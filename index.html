@@ -39,15 +39,13 @@
                 <div class="success" > lookit </div>
         </div>
     </body>
-    <script id="simple_example" type="raw_file">
-[item]
-pi : 3.14;
-randomItem : 1:10;
-a, b : c, d | 1, 2
-
-[Second]
-value : "special 324"
-    </script>
+    <pre id="simple_example" type="raw_file">
+   [item]
+   pi : 3.14;
+   randomItem : 1:10;
+   metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10; 
+   description: this is a @metalColor ring that is worth @metalValue 
+    </pre>
     <script id="sample_text" type="raw_file">
         // ideas for a DSL for proc items
 // assume .desc is default? 
