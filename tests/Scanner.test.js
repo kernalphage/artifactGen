@@ -1,4 +1,4 @@
-import { Scanner } from './Scanner.js';
+import { Scanner } from '../Scanner.js';
 
 test('Scanner finds all single-character tokens', () => {
     let source = "()[]{},.-+;:/*!@$#?=";

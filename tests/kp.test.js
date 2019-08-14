@@ -9,7 +9,7 @@ import {
     isDigit,
     isSameType,
     FindFromSymbol
-} from "./kp.js";
+} from "../kp.js";
 
 test('basic definition', () => {
 

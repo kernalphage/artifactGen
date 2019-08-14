@@ -1,5 +1,5 @@
-import {Scanner} from './Scanner.js';
-import {Parser} from './Parser.js';
+import {Scanner} from '../Scanner.js';
+import {Parser} from '../Parser.js';
 
 
 // TODO: Should these tests be mocked? Just as raw token stream

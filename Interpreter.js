@@ -138,7 +138,7 @@ class Environment{
                 out += JSON.stringify(value);
             }
             return out;
-        }).join("<br/>");
+        }).join("\n");
         console.log(output);
         return output;
     }
@@ -171,8 +171,8 @@ export class BasicInterpreter extends I_Interpreter {
     export(){
         let output = ""; 
         _.forIn(this.definitions, (v,k)=> {
-            output += k+": <br/>" + v.export();
-        }).join("<br/>");
+            output += k+": \n" + v.export();
+        }).join("\n");
         return output;
     }
     constructor(){

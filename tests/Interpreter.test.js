@@ -1,6 +1,6 @@
-import {Scanner} from './Scanner.js';
-import {Parser} from './Parser.js';
-import {Printer, BasicInterpreter} from './Interpreter.js';
+import {Scanner} from '../Scanner.js';
+import {Parser} from '../Parser.js';
+import {Printer, BasicInterpreter} from '../Interpreter.js';
 
 
 test('basic definition', () => {
@@ -43,6 +43,6 @@ test('basic definition', () => {
     parse.parse_main();
     basic.execute(parse.definitions);
     console.log(basic.export());
-    expect(basic.export()).toBe("Broken");
+    expect(basic.export()).toMatchSnapshot();
   });
   
