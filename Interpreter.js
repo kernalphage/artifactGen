@@ -94,9 +94,9 @@ export class Printer extends I_Interpreter{
 }
 
 class Environment{
-    constructor(parent){
+    constructor(id){
         this.defs = {};
-        this.parent = parent;
+        this.id = id;
     }
     applyDefinition(target, value) {
         console.log("Assigning definition " + target + " = " + value);
@@ -134,8 +134,8 @@ class Environment{
             let out = key+":";
             if(value instanceof Environment){
                 out += value.export();
-            } else{
-                out += JSON.stringify(value);
+            } else {
+                out += _.flatMap(value, (v)=>{return v.value? v.value : v;}).join(" ");
             }
             return out;
         }).join("\n");
@@ -145,16 +145,32 @@ class Environment{
 }
 
 export class BasicInterpreter extends I_Interpreter {
+    execute(expressions){
+        let res = super.execute(expressions);
+        this.treeShake();
+        return res;
+    }
+    push_reference(loc){
+        let ref = {loc: loc, value: null, tries: 0};
+        // TODO: cache references 
+        this.toResolve.push(ref);
+        return ref;
+    }
 
+    // TODO: Actual dependency resolution
     treeShake(){
         let open = this.toResolve;
-        while(open.length > 0){
+
+        let failsafe = 100;
+        while(open.length > 0 && (failsafe-->0)){
             let cur = open.pop();
-            let val = this.findRvalue(cur.rvalue);
+            let val = this.findRvalue(cur.loc);
             if(val){
-                cur.lvalue.applyDefinition(cur.location, val);
+                cur.value = val;
             } else {
+                cur.tries ++;
                 open.push(cur);
+                // tODO: shuffle before pushing? 
             }
         }
     }
@@ -178,6 +194,7 @@ export class BasicInterpreter extends I_Interpreter {
     constructor(){
         super();
         this.definitions = [];
+        this.toResolve = [];
 
         this.visitors = {
             Assignment:  (expr, ctx)=>{
@@ -225,11 +242,13 @@ export class BasicInterpreter extends I_Interpreter {
             RValue:  (expr, ctx)=>{
                 // todo: tree shaking?
                 let loc = this.visit(expr.locator);
-                let rval = ctx.get(loc);
-                if(rval){
-                    return rval;
-                } else {
-                    return "NOT_FOUND";
+                try {
+                    let rval = ctx.get(loc);
+                    if(rval){
+                        return rval;
+                    } 
+                } finally{
+                    return this.push_reference(_.concat(ctx.id, loc)); 
                 }
             },
             // sideEffect

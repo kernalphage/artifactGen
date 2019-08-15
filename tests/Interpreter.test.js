@@ -2,17 +2,21 @@ import {Scanner} from '../Scanner.js';
 import {Parser} from '../Parser.js';
 import {Printer, BasicInterpreter} from '../Interpreter.js';
 
+const mockMath = Object.create(global.Math);
+let seed = 1;
+mockMath.random = ()=> {var x = Math.sin(seed++ *641.23523)*1782.12412; return x - Math.floor(x); };
+global.Math = mockMath;
 
 test('basic definition', () => {
     let source = `
    [item]
    pi : 3.14;
    randomItem : 1:10;
-   metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10 
-   description: this is a @metalColor ring, that is worth @metalValue 
+   metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10;
+   description: this is a @metalColor ring, that is worth @metalValue;
   
    [Second]
-   value : "special 324"
+   value : "special 324";
   `;
   // TODO: it's time to bundle scan/parse/interpret into a "program" class
   // and decide if things shoud automagically parse on construction
@@ -29,8 +33,8 @@ test('basic definition', () => {
    [item]
    pi : 3.14;
    randomItem : 1:10;
-   metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10 
-   description: this is a @metalColor ring, that is worth @metalValue 
+   metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10 ;
+   description: this is a @metalColor ring, that is worth @metalValue; 
   
    [Second]
    value : "special 324";
