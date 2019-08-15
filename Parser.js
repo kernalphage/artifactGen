@@ -49,7 +49,7 @@ export class Parser {
         return this.tokens[this.current - 1];
     }
     isAtEnd() {
-        return this.peek().symbol == tk.EOF;
+        return this.peek().symbol == tk.EOF || (this.current > this.tokens.length);
     }
 
     // i think this is the right layer to say... log if tokens is undefined or empty
@@ -82,13 +82,16 @@ export class Parser {
                 this.synchronize();
             }
         }
+        if(this.errors.length != 0){
+            return (this.definitions = []);
+        }
         return this.definitions;
     }
 
     // TODO: push this back so it can recover at tk.
     synchronize(){
         console.log("Recovering from error in " + this.curDefinition.value);
-        while(this.peek() != tk.EOF && this.peek() != tk.LEFT_BRACKET){
+        while(!this.isAtEnd() && (this.peek() != tk.LEFT_BRACKET)){
             this.advance();
         }
     }
