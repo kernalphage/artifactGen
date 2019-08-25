@@ -2,6 +2,8 @@ import {Scanner} from '../Scanner.js';
 import {Parser} from '../Parser.js';
 import {Printer, BasicInterpreter} from '../Interpreter.js';
 
+
+// TODO: folow better Jest practices for mock setup/teardown
 const mockMath = Object.create(global.Math);
 let seed = 1;
 mockMath.random = ()=> {var x = Math.sin(seed++ *641.23523)*1782.12412; return x - Math.floor(x); };
@@ -40,7 +42,6 @@ test('basic definition', () => {
    value : "special 324";
    value2 : "324"
   `;
-  // TODO: oh god am I going to have to mock random? or just seed it
     let scan = new Scanner(source);
     let parse = new Parser(scan.tokens);
     let basic = new BasicInterpreter();

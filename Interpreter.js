@@ -240,9 +240,9 @@ export class BasicInterpreter extends I_Interpreter {
                 }
             },
             RValue:  (expr, ctx)=>{
-                // todo: tree shaking?
                 let loc = this.visit(expr.locator);
                 try {
+                    // todo: ctx.get is not correct. this could be global
                     let rval = ctx.get(loc);
                     if(rval){
                         return rval;

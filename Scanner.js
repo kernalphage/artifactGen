@@ -34,10 +34,10 @@ const literals = {
     "'": ["'", tk.LITERAL],
 };
 
-// TODO: use ScannerError instead of this.error for consistency with ParserErrror
 class ScannerError extends Error{
     constructor(message, token){
-
+        super("Scan error at token " + token + ": " + message );
+        this.name = "ScannerError";
     }
 }
 
@@ -59,7 +59,11 @@ export class Scanner {
             try {
                 this.scanToken();
             } catch (e) {
-                this.errors.push(e);
+                if (e instanceof ScannerError){
+                    this.errors.push(e);
+                } else {
+                    this.errors.push(new ScannerError("Unexpected error: " + e.message, this.peek()));
+                }
             }
         }
         this.tokens.push(new Token(tk.EOF, "", this.line));
@@ -105,7 +109,7 @@ export class Scanner {
             return this.addToken(singleTokens[c]);
         }
 
-        return this.error("unparsed string at " + c);
+        return this.error("unparsed character " + c );
     }
 
     scanString(boundary, tokenType) {
@@ -124,17 +128,17 @@ export class Scanner {
                 // Parse {interpolation}
                 case "{": {
                     this.advance();
-                let val = this.source.substring(this.start + 1, this.current - 1);
-                if(val.length > 0){
-                    this.addToken(tokenType, val);
-                }
-                while(this.peek() != "}" && !this.isAtEnd()){
+                    let val = this.source.substring(this.start + 1, this.current - 1);
+                    if(val.length > 0){
+                        this.addToken(tokenType, val);
+                    }
+                    while(this.peek() != "}" && !this.isAtEnd()){
+                        this.start = this.current;
+                        this.scanToken();
+                    }
                     this.start = this.current;
-                    this.scanToken();
-                }
-                this.start = this.current;
-                    break;
-                }
+                        break;
+                    }
                 // parse "#interpolation"
                 case "@":
                 case "#":
@@ -194,7 +198,7 @@ export class Scanner {
 
 /// helper functions for moving along the source 
     error(message) {
-        throw new Error("Error at " + this.line + ":" + this.current + ": " + message);
+        throw new ScannerError("Error at " + this.line + ":" + this.current + ": " + message, this.peek());
     }
     isAtEnd() {
         return this.current >= this.source.length;

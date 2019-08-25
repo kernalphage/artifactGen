@@ -2,8 +2,6 @@ import {Scanner} from '../Scanner.js';
 import {Parser} from '../Parser.js';
 
 
-// TODO: Should these tests be mocked? Just as raw token stream
-// I'm thinking no, unless I tested find_many or something directly.
 
 test('basic definition', () => {
   let source = `
@@ -54,7 +52,7 @@ let errors = [];
 
 });
 
-
+// TODO: create this test as a mocked raw token stream
 test('find_many', ()=>{
   
 });

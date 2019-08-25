@@ -17,20 +17,17 @@ const ExpressionData = {
 // I'm so funny 
 export const [Ex, pr] = MakeTypeclass(ExpressionData);
 
+class ParserError extends Error {
+    constructor(message, token) {
+        super("Parser error at " + token + ": " + message);
+        this.name = "ParserError";
+    }
+}
 export class Parser {
 
     constructor(tokens) {
         this.tokens = tokens;
         this.current = 0;
-    }
-
-    // TODO: make this a class instead
-    ParserError(message, token) {
-        token = token || this.peek();
-        return {
-            message: message,
-            token: token
-        };
     }
 
     // Parser helper functions 
@@ -55,7 +52,7 @@ export class Parser {
     // i think this is the right layer to say... log if tokens is undefined or empty
     match(...tokens) {
         if (!_.every(tokens)) {
-            throw this.ParserError("One or more tokens to match are undefined! " + JSON.stringify(tokens));
+            this.error("One or more tokens to match are undefined! " + JSON.stringify(tokens));
         }
         let matched = tokens.some((t) => this.check(t));
         if (matched) {
@@ -65,6 +62,9 @@ export class Parser {
     }
 
 
+    error(message){
+        throw new ParserError(message, this.peek());
+    }
     // End parser helper functions 
 
     parse_main() {
@@ -88,7 +88,7 @@ export class Parser {
         return this.definitions;
     }
 
-    // TODO: push this back so it can recover at tk.
+    // Continue until reaching a [DEFINITION] 
     synchronize(){
         console.log("Recovering from error in " + this.curDefinition.value);
         while(!this.isAtEnd() && (this.peek() != tk.LEFT_BRACKET)){
@@ -103,7 +103,7 @@ export class Parser {
             parse_fn = () => {
                 if (this.match(token))
                     return this.previous();
-                throw this.ParserError("Could not find token " + token.toString());
+                this.error("Could not find token " + token.toString());
             };
         }
 
@@ -114,7 +114,7 @@ export class Parser {
                 let parsed = parse_fn.apply(this);
                 ret.push(parsed);
             } catch (e) {
-                if(allow_trailing){
+                if(allow_trailing && e instanceof ParserError){
                     // TODO: this might cause more problems than it solves. 
                     this.current = curtoken;
                     console.log("Ignoring message " + e.message + " and popping back to " + this.tokens[this.current].toString());
@@ -127,7 +127,7 @@ export class Parser {
         }
         while (this.match(break_token, tk.EOF));
         if (must_find_one && ret.length == 0) {
-            throw this.ParserError("Could not find a match for find many " + break_token.toString());
+            this.error("Could not find a match for find many " + break_token.toString());
         }
         return ret;
     }
@@ -157,7 +157,7 @@ export class Parser {
             }
         }
         if(values.length == 0){
-            throw this.ParserError("this is not a base expression");
+            this.error("this is not a base expression");
         }
         return Ex(pr.Base, values);
     }
@@ -177,7 +177,7 @@ export class Parser {
     parse_assignment() {
         let targets = this.find_many(this.parse_lvalue, tk.COMMA);
         if (!this.match(tk.COLON)) {
-            throw this.ParserError("Missing ':' in assignment definition");
+            this.error("Missing ':' in assignment definition");
         }
         let values = this.find_many(this.parse_statement, tk.BAR);
         return Ex(pr.Assignment, targets, values);
@@ -196,16 +196,16 @@ export class Parser {
     // definition -> "[" LITERAL "]" list(assignment, ';')
     parse_definition() {
         if (!this.match(tk.LEFT_BRACKET)) {
-            throw this.ParserError("Definitions must start with a [");
+            this.error("Definitions must start with a [");
         }
         if (!this.match(tk.LITERAL)) {
-            throw this.ParserError("Only literals are allowd in the ");
+            this.error("Only literals are allowd in the ");
         }
         let name = this.previous();
         this.curDefinition = name;
 
         if (!this.match(tk.RIGHT_BRACKET)) {
-            throw this.ParserError("Missing End bracket for object definition");
+            this.error("Missing End bracket for object definition");
         }
         let assignments = this.find_many(this.parse_assignment, tk.SEMICOLON);
         let defExpr = Ex(pr.Definition, name, assignments);
@@ -225,7 +225,7 @@ export class Parser {
     // rvalue -> ("#","@","$") locator_expr 
     parse_rvalue() {
         if (!this.match(tk.AT, tk.DOLLAR, tk.HASH)) {
-            throw this.ParserError("target reference should begin with @ or $");
+            this.error("target reference should begin with @ or $");
         }
         var reftype = this.previous();
         var location = this.parse_locator();
