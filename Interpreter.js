@@ -236,6 +236,7 @@ export class BasicInterpreter extends I_Interpreter {
                 if(expr.values.length == 1){
                     return expr.values[0].value;
                 } else {
+                    // TODO: Support floats
                     return randomRangeInt(... _.map(expr.values, 'value'));
                 }
             },

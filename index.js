@@ -1,19 +1,12 @@
-import {tk} from "./Token.js"
-import {Scanner} from "./Scanner.js"
-import {log} from "./logging.js"
-import { Parser } from "./Parser.js";
-import { Printer, BasicInterpreter } from "./Interpreter.js";
+import {tk} from "./Token.js";
+import {log} from "./logging.js";
+import {ArtifactGenerator} from "./artifactGenerator.js";
 import{_} from 'lodash';
 
 var idea_txt = document.getElementById("sample_text").innerText;
 var simple_text = document.getElementById("simple_example").innerText;
 
-var s =new Scanner(simple_text);
-var p = new Parser(s.tokens);
-p.parse_main();
-var print = new BasicInterpreter();
-
-print.execute(p.definitions);
+var artGen = new ArtifactGenerator(simple_text);
 addMyTag(print.export(), "warn", "logger");
 
 function addMyTag(text, klass, parent){

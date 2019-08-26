@@ -6,7 +6,7 @@ const ExpressionData = {
     Assignment: ['targets', 'values'],
     Base: ['value'],
     Definition: ['id', 'assignments'],
-    Function: ['locator', 'parameters'],
+    ExFunction: ['locator', 'parameters'],
     Locator: ['location'],
     LValue: ['reftype', 'locator'],
     Number: ['values'],
@@ -28,6 +28,7 @@ export class Parser {
     constructor(tokens) {
         this.tokens = tokens;
         this.current = 0;
+        this.parse_main();
     }
 
     // Parser helper functions 
@@ -47,6 +48,9 @@ export class Parser {
     }
     isAtEnd() {
         return this.peek().symbol == tk.EOF || (this.current > this.tokens.length);
+    }
+    mustMatch(tokens, errorMessage){
+        return this.match(...tokens) || this.error(errorMessage);
     }
 
     // i think this is the right layer to say... log if tokens is undefined or empty
@@ -96,6 +100,8 @@ export class Parser {
         }
     }
 
+
+    // TODO: Should I just have an "end tokens" that signifies the end of the list? 
     find_many(parse_fn, break_token, must_find_one = true, allow_trailing = true) {
         // map tk.SYMBOL => function to find the symbol
         if (!(parse_fn instanceof Function)) {
@@ -176,9 +182,8 @@ export class Parser {
     // assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
     parse_assignment() {
         let targets = this.find_many(this.parse_lvalue, tk.COMMA);
-        if (!this.match(tk.COLON)) {
-            this.error("Missing ':' in assignment definition");
-        }
+        this.mustMatch(tk.COLON, "Missing ':' in assignment definition")
+
         let values = this.find_many(this.parse_statement, tk.BAR);
         return Ex(pr.Assignment, targets, values);
     }
@@ -195,18 +200,14 @@ export class Parser {
 
     // definition -> "[" LITERAL "]" list(assignment, ';')
     parse_definition() {
-        if (!this.match(tk.LEFT_BRACKET)) {
-            this.error("Definitions must start with a [");
-        }
-        if (!this.match(tk.LITERAL)) {
-            this.error("Only literals are allowd in the ");
-        }
+        this.mustMatch(tk.LEFT_BRACKET, "Definitions must start with a [");
+        this.mustMatch(tk.LITERAL, "Only literals are allowd in definition names");
+
         let name = this.previous();
         this.curDefinition = name;
 
-        if (!this.match(tk.RIGHT_BRACKET)) {
-            this.error("Missing End bracket for object definition");
-        }
+        this.mustMatch(tk.RIGHT_BRACKET, "Missing End bracket for object definition");
+
         let assignments = this.find_many(this.parse_assignment, tk.SEMICOLON);
         let defExpr = Ex(pr.Definition, name, assignments);
         return defExpr;
@@ -224,11 +225,21 @@ export class Parser {
     }
     // rvalue -> ("#","@","$") locator_expr 
     parse_rvalue() {
-        if (!this.match(tk.AT, tk.DOLLAR, tk.HASH)) {
-            this.error("target reference should begin with @ or $");
-        }
+        this.mustMatch([tk.AT, tk.DOLLAR, tk.HASH], "target reference should begin with @, # or $");
         var reftype = this.previous();
         var location = this.parse_locator();
         return new Ex(pr.RValue, reftype, location);
+    }
+
+    parse_function_expr() {
+        this.mustMatch(tk.BANG, "Functions must start with an '!'");
+        this.mustMatch(tk.LITERAL, "Function names must be a literal value");
+        let loc = this.previous();
+        
+        this.mustMatch(tk.LEFT_PAREN, "Function parameters must start with a (");
+        let params = this.find_many(this.parse_base_expr, tk.COMMA);
+        this.mustMatch(tk.RIGHT_PAREN, "Function parameters must end with a )");
+
+        return new Ex(pr.ExFunction, loc, params);
     }
 }

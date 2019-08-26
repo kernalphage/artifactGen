@@ -22,11 +22,10 @@ test('basic definition', () => {
 `;
   let scan = new Scanner(source);
   let parse = new Parser(scan.tokens);
-  parse.parse_main();
   expect(parse.definitions.length).toBe(3);
 });
 
-
+/*
 // TODO: need more code covereage here
 test('basic parsing mixups', () => {
   let sources = [`
@@ -42,7 +41,6 @@ let errors = [];
   sources.forEach((source)=>{
     let scan = new Scanner(source);
     let parse = new Parser(scan.tokens);
-    parse.parse_main();
     console.log(parse.definitions);
     console.log(parse.errors);
     expect(parse.definitions.length).toBe(0);
@@ -56,3 +54,4 @@ let errors = [];
 test('find_many', ()=>{
   
 });
+*/

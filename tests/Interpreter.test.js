@@ -15,7 +15,7 @@ test('basic definition', () => {
    pi : 3.14;
    randomItem : 1:10;
    metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10;
-   description: this is a @metalColor ring, that is worth @metalValue;
+   description: this is a @metalColor ring that is worth @metalValue;
   
    [Second]
    value : "special 324";
@@ -25,7 +25,6 @@ test('basic definition', () => {
     let scan = new Scanner(source);
     let parse = new Parser(scan.tokens);
     let print = new Printer();
-    parse.parse_main();
     let result = print.execute(parse.definitions);
     expect(result).toMatchSnapshot();
   });
@@ -36,7 +35,7 @@ test('basic definition', () => {
    pi : 3.14;
    randomItem : 1:10;
    metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10 ;
-   description: this is a @metalColor ring, that is worth @metalValue; 
+   description: this is a @metalColor ring that is worth @metalValue; 
   
    [Second]
    value : "special 324";
@@ -45,7 +44,6 @@ test('basic definition', () => {
     let scan = new Scanner(source);
     let parse = new Parser(scan.tokens);
     let basic = new BasicInterpreter();
-    parse.parse_main();
     basic.execute(parse.definitions);
     console.log(basic.export());
     expect(basic.export()).toMatchSnapshot();
