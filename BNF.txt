@@ -19,15 +19,14 @@ base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | funct
 // TODO: shorthand for "what's on the left side" eg: 
 // @height : #previous.@  
 // TODO: variable expansion: width, height : #rect.width, #rect.height => width, height : ...#rect 
-// @ is implemented, $ and # are not
+// TODO: @ is implemented, $ and # are not
 rvalue -> ("#","@","$") locator_expr
 
-// TODO:
-[NOT IMPLEMENTED]
+// TODO: [NOT IMPLEMENTED]
 side_effect -> lvalue equaity statement_expr
 equality -> (= | += | *= | /= | -=)
-function_expr -> "!" LITERAL group_expr?
-
+function_expr -> "!" LITERAL group_expr
+// this might be a duplicate of Statement_expr
 group_expr -> "(" list(base_expr, ",") ")"
 
 //reward, nextGoal  :  {agree: gold, fetch_quest | silver, fetch_quest; disagree: tomato, shower}

@@ -1,5 +1,5 @@
 # artifactGen
-Language for declaring procedural artifacts and the parameters to generate them, heavily inspired by [Tracery](http://tracery.io/), [Ortiel's Nested](https://orteil.dashnet.org/nested)  and Dwarf Fortress's markup language.
+Language for declaring procedural artifacts and the parameters to generate them, heavily inspired by [Tracery](http://tracery.io/), [Ortiel's Nested](https://orteil.dashnet.org/nested)  and Dwarf Fortress's markup language. This wouldn't be possible without Bob Nystrom's [Crafting Interpreters](https://craftinginterpreters.com/)
 
 It supports string replacement & random choices/numbers for assigning to values.
 
