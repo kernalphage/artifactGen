@@ -2,17 +2,16 @@
 [IMPLEMENTED]
 world = list(definiton, NEWLINE)
 definition -> "[" LITERAL "]" list(assignment,";")
-assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
 // person.height.cm for example 
 locator_expr -> list(LITERAL, ".")
 statement_expr -> list( base_expr , ",")
-lvalue -> ("$")? locator_expr
 number_expr -> NUMBER | list(NUMBER, ":")
 
 
 [PLANNED CHANGES]
 // todo: expand with an expression that allows @(#location_to_modify)
-target_expr -> ("@" | "$" ) locator_expr
+// TODO: $value*, adds a multiply expression to the lvalue somehow
+lvalue -> ("$" | "@")? locator_expr
 // TODO: Many tokens, as long as it doesn't include a ,?
 // TODO: Do i want to split out side_effect and function_expr? so choice_expr can use base_expr directly
 base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | function_expr
@@ -21,6 +20,12 @@ base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | funct
 // TODO: variable expansion: width, height : #rect.width, #rect.height => width, height : ...#rect 
 // TODO: @ is implemented, $ and # are not
 rvalue -> ("#","@","$") locator_expr
+// TODO: SUPER: #group will inject objects into the current namespace, instead of making a child object
+// TODO: Be very careful with "|" operator precedence
+// TODO: use = instead of : ? 
+assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
+
+
 
 // TODO: [NOT IMPLEMENTED]
 side_effect -> lvalue equaity statement_expr
