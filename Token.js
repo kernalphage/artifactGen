@@ -18,6 +18,7 @@ export const tk = makeEnum([
     "LEFT_PAREN",
     "LITERAL",
     "MINUS",
+    "NEWLINE",
     "NUMBER",
     "PLUS",
     "QUESTION",

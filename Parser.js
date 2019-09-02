@@ -131,7 +131,7 @@ export class Parser {
                 }
             }
         }
-        while (this.match(break_token, tk.EOF));
+        while (this.match(break_token, tk.EOF, tk.NEWLINE));
         if (must_find_one && ret.length == 0) {
             this.error("Could not find a match for find many " + break_token.toString());
         }

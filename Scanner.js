@@ -14,6 +14,7 @@ const singleTokens = {
     "{": tk.LEFT_CURLY,
     "(": tk.LEFT_PAREN,
     "-": tk.MINUS,
+    "\n": tk.NEWLINE,
     "+": tk.PLUS,
     "?": tk.QUESTION,
     "]": tk.RIGHT_BRACKET,
@@ -22,11 +23,9 @@ const singleTokens = {
     ";": tk.SEMICOLON,
     "/": tk.SLASH,
     "*": tk.STAR,
-    
     "\r": null,
     " ": null,
     "\t": null,
-    "\n": null,
 };
 
 const literals = {
@@ -104,12 +103,22 @@ export class Scanner {
         if (c == "/" && this.peek() == "/") {
             return this.scanComment();
         }
+
+        // TODO: untested
+        if(c == '\\' && (this.peek() in singleTokens)){
+            c = this.advance(); 
+            if(c == "\n"){ // don't include newline literals 
+                return;
+            }
+            this.advance();
+            return this.addToken(tk.LITERAL);
+        }
         // find tokens 
         if (c in singleTokens) {
             return this.addToken(singleTokens[c]);
         }
 
-        return this.error("unparsed character " + c );
+        //return this.error("unparsed character " + c );
     }
 
     scanString(boundary, tokenType) {
