@@ -7,16 +7,24 @@ import{_} from 'lodash';
 var idea_txt = document.getElementById("sample_text").innerText;
 var simple_text = document.getElementById("simple_example").innerText;
 
+
+try{
 var artGen = new ArtifactCompiler(simple_text);
 
-let tokens = artGen.scanner.tokens;
-for(var i =0; i < tokens.length; i++){
-    addMyTag(tokens[i].string, tokens[i].symbol, "tokens");
+    let tokens = artGen.scanner.tokens;
+    for (var i = 0; i < tokens.length; i++) {
+        addMyTag(tokens[i].string, tokens[i].symbol, "tokens");
+    }
+    let obj = artGen.generate();
+        let output = "";
+        _.forIn(obj, (v, k) => {
+            output += "---" + k + "---: \n" + v.export() + "\n\n";
+        });
+        log(output, "success");    
+} catch(e){
+    log(e.join("\n"), "warn");
 }
 
-
-let obj = artGen.generate();
-addMyTag(obj.toString(), "warn", "logger");
 
 function addMyTag(text, klass, parent){
    text = text.replace(/\\n/g, "<br\>");
@@ -38,7 +46,7 @@ export function log(text, level){
         text = JSON.stringify(text);
     }
     text = text.replace(/\\n/g, "<br\>");
-    let l = document.createElement("pre", {class: level});
+    let l = document.createElement("div", {class: level});
     l.innerHTML = text;
     document.getElementById("logger").appendChild(l);
 }

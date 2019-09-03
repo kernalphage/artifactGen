@@ -39,4 +39,6 @@ decision_expr -> "{"  list(choice_expr, ';') "}"
 choice_expr -> base_expr ":" list(statement_expr, "|")
 
 
-// TODO: 9/3: put all  find_many in comments, then refactor from there
+// TODO: 9/3: refactor find_many back into a single function?
+// I don't think i want any trailing separators, except for semicolons 
+// I think i could do a _ for "noop", as in " thing, else, optional = a,c,_ | 1,3,5; " 

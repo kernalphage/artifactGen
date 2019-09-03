@@ -11,10 +11,10 @@
             border: 3px solid yellow;
             width: 100%;
         }
-        .logger .warn {
+        .warn {
             background-color: rosybrown;
         }
-        .logger .success {
+        .success {
             background-color: palegreen;
         }
         #tokens div{
@@ -41,19 +41,18 @@
     </body>
     <pre id="simple_example" type="raw_file">
 [item]
-pi : 3.14;
-randomItem : 1:10;
-metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10; 
-description: this is a @metalColor ring that is worth @metalValue
+pi = 3.14;
+randomItem = 1:10;
+metalColor, metalValue  = golden, 200 | silver, 100 | copper, 10; 
+description= this is a @metalColor ring that is worth @metalValue;
 
 [Second]
-math : #maths;
-value : "special 324"
+value = "special 324"
 
 [maths]
-pi : 3.14;
-alsoPi : @pi;
-e : 3
+pi = 3.14;
+alsoPi = @pi;
+e = 3
     </pre>
     <script id="sample_text" type="raw_file">
         // ideas for a DSL for proc items
