@@ -1,6 +1,6 @@
 
 [IMPLEMENTED]
-world = list(definiton, NEWLINE)
+world -> list(definiton, NEWLINE)
 definition -> "[" LITERAL "]" list(assignment,";")
 // person.height.cm for example 
 locator_expr -> list(LITERAL, ".")
@@ -37,3 +37,6 @@ group_expr -> "(" list(base_expr, ",") ")"
 //reward, nextGoal  :  {agree: gold, fetch_quest | silver, fetch_quest; disagree: tomato, shower}
 decision_expr -> "{"  list(choice_expr, ';') "}"
 choice_expr -> base_expr ":" list(statement_expr, "|")
+
+
+// TODO: 9/3: put all  find_many in comments, then refactor from there
