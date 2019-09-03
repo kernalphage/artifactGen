@@ -1,15 +1,14 @@
-import {
-    _
-} from 'lodash';
-import {
-    makeEnum,
+import{_} from 'lodash';
+
+import ArtifactGenerator from "..";
+let {
     MakeTypeclass,
     isAlpha,
     isAlphaNumeric,
     isDigit,
     isSameType,
     FindFromSymbol
-} from "../kp.js";
+} = ArtifactGenerator.kp;
 
 test('basic definition', () => {
 

@@ -1,7 +1,7 @@
-import {Scanner} from '../Scanner.js';
-import {Parser} from '../Parser.js';
-
-
+import ArtifactGenerator from "..";
+let {Parser, Scanner} = ArtifactGenerator.Core;
+// let Scanner = ArtifactGenerator.Core;
+import{_} from 'lodash';
 
 test('basic definition', () => {
   let source = `

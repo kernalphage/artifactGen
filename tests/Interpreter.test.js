@@ -1,6 +1,6 @@
-import {Scanner} from '../Scanner.js';
-import {Parser} from '../Parser.js';
-import {Printer, BasicInterpreter} from '../Interpreter.js';
+
+import ArtifactGenerator from "..";
+let {Scanner, Parser, Printer, BasicInterpreter} = ArtifactGenerator.Core;
 
 
 // TODO: folow better Jest practices for mock setup/teardown

@@ -29,7 +29,7 @@ Source file:
 
 Usage: 
 ```
-let item = new ArtifactGenerator(itemSource).generate();
+let item = new ArtifactCompiler(itemSource).generate();
 console.log(item.export());
 ```
 

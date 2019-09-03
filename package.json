@@ -2,22 +2,34 @@
   "name": "antique_gen",
   "version": "1.0.0",
   "description": "procedural text and json generator based on twine and dwarf fortress",
-  "main": "index.js",
+  "files": [
+    "lib/"
+  ],
+  "main": "lib/index.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "browserify index.js --debug -o dist/bundle.js",
-    "watch": "watchify index.js --debug -o dist/bundle.js -v"
+    "build": "browserify lib/index.js --debug -o dist/bundle.js",
+    "watch": "watchify lib/index.js --debug -o dist/bundle.js -v",
+    "example": "npm run build; browserify example/index.js --debug -o example/dist/bundle.js",
+    "example-watch": "watchify example/index.js --debug -o example/dist/bundle.js -v"
   },
   "author": "matt dobler",
   "license": "ISC",
-  "jest":{
-    "moduleFileExtensions": ["js", "jsx"],
-    "moduleDirectories": ["node_modules", "bower_components", "shared"],
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "bower_components",
+      "shared"
+    ],
     "transform": {
       "^.+\\.js$": "babel-jest"
     }
   },
-  "babel":{
+  "babel": {
     "presets": [
       "@babel/preset-env"
     ]
@@ -41,6 +53,7 @@
     "@babel/preset-react": "^7.0.0",
     "babelify": "^10.0.0",
     "browserify": "^16.3.0",
+    "lodash": "^4.17.15",
     "watchify": "^3.11.1"
   },
   "devDependencies": {

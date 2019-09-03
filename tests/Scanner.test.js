@@ -1,4 +1,5 @@
-import { Scanner } from '../Scanner.js';
+import ArtifactGenerator from "..";
+let {Scanner} = ArtifactGenerator.Core;
 
 test('Scanner finds all single-character tokens', () => {
     let source = "()[]{},.-+;:/*!@$#?=";

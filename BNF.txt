@@ -23,7 +23,7 @@ rvalue -> ("#","@","$") locator_expr
 // TODO: SUPER: #group will inject objects into the current namespace, instead of making a child object
 // TODO: Be very careful with "|" operator precedence
 // TODO: use = instead of : ? 
-assignment -> list(lvalue, ",") ":" list(statement_expr, "|")
+assignment -> list(lvalue, ",") "=" list(statement_expr, "|")
 
 
 
