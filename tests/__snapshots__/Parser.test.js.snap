@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`basic parsing mixups 1`] = `
+Array [
+  Array [
+    Object {
+      "message": "Could not find a match for find many Symbol(SEMICOLON)",
+      "token": Token {
+        "line": 3,
+        "string": "two_lines",
+        "symbol": Symbol(LITERAL),
+        "value": "two_lines",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "message": "Could not find a match for find many Symbol(SEMICOLON)",
+      "token": Token {
+        "line": 3,
+        "string": "error",
+        "symbol": Symbol(LITERAL),
+        "value": "error",
+      },
+    },
+  ],
+]
+`;

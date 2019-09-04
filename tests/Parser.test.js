@@ -6,19 +6,19 @@ import{_} from 'lodash';
 test('basic definition', () => {
   let source = `
  [item]
- pi : 3.14;
- randomItem : 1:10;
- metalColor, metalValue  : gold, 200 | silver, 100 | copper, 10; 
- description: this is a @metalColor ring that is worth @metalValue 
+ pi = 3.14;
+ randomItem = 1:10;
+ metalColor, metalValue  = gold, 200 | silver, 100 | copper, 10; 
+ description = this is a @metalColor ring that is worth @metalValue 
 
  [Second]
- math : #maths;
- value : "special 324"
+ math = #maths;
+ value = "special 324"
 
  [maths]
- pi : 3.14;
- alsoPi : @pi;
- e : 3
+ pi = 3.14;
+ alsoPi = @pi;
+ e = 3
 `;
   let scan = new Scanner(source);
   let parse = new Parser(scan.tokens);

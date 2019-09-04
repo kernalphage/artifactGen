@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`basic definition 1`] = `
+Array [
+  "item: <br>:=3.14,:=1 to 10, :=gold,200[OR]silver,100[OR]copper,10,description",
+]
+`;
+
+exports[`basic json value 1`] = `
+"item: 
+pi:3.14
+randomItem:7
+metalColor:gold
+metalValue:200"
+`;

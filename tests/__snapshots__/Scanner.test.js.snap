@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Scanner export 1`] = `
+"Source file: 
+Lines: 9
+Symbol(LEFT_BRACKET)>[< with value [
+Symbol(LITERAL)>item< with value item
+Symbol(RIGHT_BRACKET)>]< with value ]
+Symbol(LITERAL)>pi< with value pi
+Symbol(COLON)>:< with value :
+Symbol(NUMBER)>3.14< with value 3.14
+Symbol(SEMICOLON)>;< with value ;
+Symbol(LITERAL)>randomItem< with value randomItem
+Symbol(COLON)>:< with value :
+Symbol(NUMBER)>1< with value 1
+Symbol(COLON)>:< with value :
+Symbol(NUMBER)>10< with value 10
+Symbol(SEMICOLON)>;< with value ;
+Symbol(LITERAL)>a< with value a
+Symbol(COMMA)>,< with value ,
+Symbol(LITERAL)>b< with value b
+Symbol(COLON)>:< with value :
+Symbol(LITERAL)>c< with value c
+Symbol(COMMA)>,< with value ,
+Symbol(LITERAL)>d< with value d
+Symbol(BAR)>|< with value |
+Symbol(NUMBER)>1< with value 1
+Symbol(COMMA)>,< with value ,
+Symbol(NUMBER)>2< with value 2
+Symbol(SEMICOLON)>;< with value ;
+Symbol(LEFT_BRACKET)>[< with value [
+Symbol(LITERAL)>Second< with value Second
+Symbol(RIGHT_BRACKET)>]< with value ]
+Symbol(LITERAL)>value< with value value
+Symbol(COLON)>:< with value :
+Symbol(LITERAL)>\\"special 324\\"< with value special 324
+Symbol(EOF)>< with value 
+"
+`;
