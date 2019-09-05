@@ -21,7 +21,6 @@ test('basic definition', () => {
    value : "special 324";
   `;
   // TODO: it's time to bundle scan/parse/interpret into a "program" class
-  // and decide if things shoud automagically parse on construction
     let scan = new Scanner(source);
     let parse = new Parser(scan.tokens);
     let print = new Printer();

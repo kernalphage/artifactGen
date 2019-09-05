@@ -48,7 +48,6 @@ There's a lot of small TODOS littering the codebase, but here are some of the hi
 
 * QOL & Best Practices
     - Raise the code coverage for tests and example code
-    - organize the project structure & class structure
     - More descriptive erors and helpful hints
     - warnings for unused properties & definitions
     - Follow a uniform coding style
@@ -58,5 +57,9 @@ There's a lot of small TODOS littering the codebase, but here are some of the hi
 * Nice to Haves
     - Support functions & extensions (eg, `!plural(@noun)` )
     - REPL / Intereactive examples 
-    - arrays an array selectors
+    - arrays and array selectors
     - Value modifiers/inventory: (eg, `value*=5`, `inventory+="sword"`)
+
+
+* Done! 
+    - organize the project structure & class structure
