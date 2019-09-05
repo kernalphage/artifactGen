@@ -1,5 +1,5 @@
 import ArtifactGenerator from "..";
-let {Scanner} = ArtifactGenerator.Core;
+let {Scanner, tk} = ArtifactGenerator.Core;
 
 test('Scanner finds all single-character tokens', () => {
     let source = "()[]{},.-+;:/*!@$#?=";
@@ -16,8 +16,8 @@ test('Scanner can correctly parse comments', () => {
 test('printing works correctly', () => {
     let source = 'one_word \n 2.5 3.';
     let scan = new Scanner(source);
-    expect(scan.tokens[0].toString()).toBe("Symbol(LITERAL)>one_word< with value one_word");
-    expect(scan.tokens[1].toString()).toBe("Symbol(NUMBER)>2.5< with value 2.5");
+    expect(scan.tokens[0].toString()).toMatch(/one_word/);
+    expect(scan.tokens[1].toString()).toMatch(/2.5/);
 });
 
 test('Scanner can correctly parse string literals', () => {
@@ -48,7 +48,7 @@ test('Scanner breaks on unterminated strings ', () => {
 test('Scanner breaks on incorrect characters ', () => {
     let source = '~`^';
     let scan = new Scanner(source);
-    expect(scan.tokens.length).toBe(0);
+    expect(scan.tokens[0].symbol).toBe(tk.EOF);
 });
 
 test("string interpolation", ()=>{
