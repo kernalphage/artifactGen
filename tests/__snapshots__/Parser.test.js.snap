@@ -3,26 +3,10 @@
 exports[`basic parsing mixups 1`] = `
 Array [
   Array [
-    Object {
-      "message": "Could not find a match for find many Symbol(SEMICOLON)",
-      "token": Token {
-        "line": 3,
-        "string": "two_lines",
-        "symbol": Symbol(LITERAL),
-        "value": "two_lines",
-      },
-    },
+    [ParserError: Parser error at >=< (line 4): Found an unexpected character in base expression (are you missing a semicolon?) ],
   ],
   Array [
-    Object {
-      "message": "Could not find a match for find many Symbol(SEMICOLON)",
-      "token": Token {
-        "line": 3,
-        "string": "error",
-        "symbol": Symbol(LITERAL),
-        "value": "error",
-      },
-    },
+    [ParserError: Parser error at >here< (line 3): Missing '=' in assignment definition(Expected [Symbol(EQUALS)])],
   ],
 ]
 `;
