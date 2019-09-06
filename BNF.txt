@@ -17,12 +17,11 @@ lvalue -> ("$" | "@")? locator_expr
 base_expr -> list(LITERAL) | STRING | number_expr | rvalue | side_effect | function_expr
 // TODO: shorthand for "what's on the left side" eg: 
 // @height : #previous.@  
-// TODO: variable expansion: width, height : #rect.width, #rect.height => width, height : ...#rect 
 // TODO: @ is implemented, $ and # are not
+// TODO: Do I even need $ anymore? one should mean "Evaluate this assignment again"
 rvalue -> ("#","@","$") locator_expr
-// TODO: SUPER: #group will inject objects into the current namespace, instead of making a child object
+// TODO: SUPER = #group; will inject objects into the current namespace, instead of making a child object
 // TODO: Be very careful with "|" operator precedence
-// TODO: use = instead of : ? 
 assignment -> list(lvalue, ",") "=" list(statement_expr, "|")
 
 

@@ -16,10 +16,7 @@ var artGen = new ArtifactCompiler(simple_text);
         addMyTag(tokens[i].string, tokens[i].symbol, "tokens");
     }
     let obj = artGen.generate();
-        let output = "";
-        _.forIn(obj, (v, k) => {
-            output += "---" + k + "---: \n" + v.export() + "\n\n";
-        });
+        let output = obj.export();
         log(output, "success");    
 } catch(e){
     log(e.join("\n"), "warn");
