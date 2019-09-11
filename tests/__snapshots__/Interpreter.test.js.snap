@@ -1,12 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`basic json value 1`] = `
-"item: 
+"item:
+description:this is a copper ring that is worth 10
 pi:3.14
 randomItem:6
-metalColor:gold
-metalValue:200
-description:this is a gold ring that is worth 200Second: 
+metalColor:copper
+metalValue:10
+Second:
 value:special 324
 value2:324"
 `;

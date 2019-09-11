@@ -25,7 +25,6 @@ global.Math = mockMath;
     let parse = new Parser(scan.tokens);
     let basic = new BasicInterpreter();
     basic.execute(parse.definitions);
-    console.log(basic.export());
     expect(basic.export()).toMatchSnapshot();
   });
   
