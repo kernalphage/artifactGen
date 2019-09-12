@@ -37,6 +37,7 @@ group_expr -> "(" list(base_expr, ",") ")"
 decision_expr -> "{"  list(choice_expr, ';') "}"
 choice_expr -> base_expr ":" list(statement_expr, "|")
 
-
 // TODO: I don't think i want to support any trailing separators, except for semicolons 
 // TODO: _ for "noop", as in " thing, else, optional = a,c,_ | 1,3,5; " 
+
+// TODO: Oh god. How do i differentiate a reference to "Hey pull this thing" versus "find this and lock it in to a value"
