@@ -1,0 +1,36 @@
+// new syntax: #! Rvalue, evaluate new each time
+!c()
+!cn()
+
+[cupidPerson]
+name = #Name;
+status =  !cn(2:5, 
+    @age / @pronouns,
+    @sign,
+    !c(hey, sup, whaddup) its !p(10, yaboi), !c(@name.first, @name.nicname),
+    !c(pro, professional, amatuer, hobbyist, "") @hobby !p(20, for life),
+    Let's get !c(your number, busy, down to ~BUSINESS !p(50, to DEFEAT the HUNNS)~, to know each other),
+    !cn(2:5, :peach:, :smile:, :wet:, :eggplant:, :eyes:, :okay:)
+    !c(looking, cruising, lookin) for !cn(0:1,hot, smart, beautiful) !c(chicks,women, girls, bros,people);
+    );
+pronouns = "Man/Male/Dude" | "Red/White/Blue" | "He/Him" | "M" | "Male" | "";
+age = 21:55;
+sign = !StaticList(signs);
+traits = // (ooh lists... my worst enemy);
+
+[Picture]
+location = bathroom;
+pose = standing | squatting | sitting; 
+background = bright | dusk | etc;
+
+
+[Conversation]
+
+[Name]
+//first, nicname = matt, matty | Tom, Tommy | Doug, doug | Greg, Grg
+first = !StaticList(firstnames);
+nicname = !map( @first, Matt, Matty, 
+                Tom, Tommy,
+                Doug, doug, 
+                Greg, Grg);
+last = !StaticList(lastnames);
