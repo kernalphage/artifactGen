@@ -1,4 +1,5 @@
 <html>
+    <meta charset="utf-8" />
     <head>
         <style>
         div, pre {
@@ -40,21 +41,29 @@
         </div>
     </body>
     <pre id="simple_example" type="raw_file">
-[item]
-pi = 3.14;
-randomItem = 1:10;
-secondstuff = #Second;
-metalColor, metalValue  = golden, 200 | silver, 100 | copper, 10; 
-description= this is a @metalColor ring that is worth @metalValue;
+[cupidPerson]
+status =!cn(3:5,
+@age "/" @pronouns,
+!p(20, total) @sign,
+!c(hey, sup, whaddup) its !p(10, yaboi) !c(#Name.first, #Name.nicname),
+!c(pro, professional, amatuer, hobbyist) @hobby !p(20, for life),
+Lets get !c(your number, busy, down to ~BUSINESS !p(50, to DEFEAT the HUNNS)~, to know each other),
+!cn(2:5, 😂, 👀, 🍆, 🍑, 💦💦, 😻),
+!c(looking, cruising, lookin) for !cn(0:1,hot, smart, beautiful) !c(chicks,women, girls, bros,people)
+);
+pronouns = "Man/Male/Dude" | "Red/White/Blue" | "He/Him" | "M" | "Male" | "";
+age = 21:55;
+sign = Aries| Taurus| Gemini| Cancer| Leo| Virgo | Libra |Scorpio| Sagittarius| Capricorn| Aquarius | Pisces; 
+hobby = phographer | dancer | gymrat | aggressive streetwalker | instagram influencer
 
-[Second]
-value = "special 324";
-colorize = !pural(special, @value);
+[Picture]
+location = bathroom;
+pose = standing | squatting | sitting;
+background = bright | dusk | etc
 
-[maths]
-pi = 3.14;
-alsoPi = @pi;
-e = 3
+[Name]
+first, nicname = matt, matty | Tom, Tommy | Doug, doug | Greg, Grg | Jim, jimbo | John, Jonnie;
+last = Brealyn | Smith | Smythe | Doe | The First | The Third | "Jr." | Crabapple
     </pre>
     <script id="sample_text" type="raw_file">
         // ideas for a DSL for proc items

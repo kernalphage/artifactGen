@@ -19,7 +19,7 @@ var artGen = new ArtifactCompiler(simple_text);
         let output = obj.export();
         log(output, "success");    
 } catch(e){
-    log(e.join("\n"), "warn");
+    log(e.message + e.callstack, "warn");
 }
 
 
