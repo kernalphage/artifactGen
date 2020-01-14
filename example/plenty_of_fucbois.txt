@@ -1,6 +1,4 @@
-// new syntax: #! Rvalue, evaluate new each time
-!c()
-!cn()
+// new syntax: #! Rvalue, evaluate new each time?
 
 [cupidPerson]
 name = #Name;
@@ -17,6 +15,7 @@ pronouns = "Man/Male/Dude" | "Red/White/Blue" | "He/Him" | "M" | "Male" | "";
 age = 21:55;
 sign = !StaticList(signs);
 traits = // (ooh lists... my worst enemy);
+hobby = base jumper | aggressive street walker | flamingo tamer
 
 [Picture]
 location = bathroom;

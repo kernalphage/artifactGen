@@ -1,0 +1,17 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "lib",
+    "strict": true, 
+    "allowJs": true, /* Allow javascript files to be compiled. */
+    "removeComments": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "src/*", "src/core/*" ]
+}
+
+/*"tests/Parser.test.js", "tests/Scanner.test.js", "tests/kp.test.js", "tests/Interpreter.test.js", "tests/ArtifactCompiler.test.js", "tests/FunctionManager.test.js" */
